@@ -64,3 +64,12 @@ $('#installBtn').addEventListener('click', async () => {
   $('#installBtn').hidden = true;
 });
 window.addEventListener('appinstalled', () => { $('#installBtn').hidden = true; });
+const plantnetToggle = $('#plantnetToggle');
+const plantnetContent = $('#plantnetContent');
+
+plantnetToggle.addEventListener('click', () => {
+  const expanded = plantnetToggle.getAttribute('aria-expanded') === 'true';
+
+  plantnetToggle.setAttribute('aria-expanded', String(!expanded));
+  plantnetContent.hidden = expanded;
+});
