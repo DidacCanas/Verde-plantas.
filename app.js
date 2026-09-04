@@ -56,10 +56,12 @@ window.addEventListener('beforeinstallprompt', event => {
   installPrompt = event;
   $('#installBtn').hidden = false;
 });
-$('#installBtn').addEventListener('click', async () => {
+on('#installBtn', 'click', async () => {
   if (!installPrompt) return;
+
   installPrompt.prompt();
   await installPrompt.userChoice;
+
   installPrompt = null;
   $('#installBtn').hidden = true;
 });
