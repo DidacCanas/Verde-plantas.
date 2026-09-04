@@ -52,4 +52,14 @@ select { font-size: 16px; padding: 14px; }
 .bottom-nav .active {
   background: #e3f0d9;
   color: #1b4d3c;
+.topbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--forest);
+}
+
+.topbar .brand {
+  color: white;
 }
