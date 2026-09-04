@@ -1,0 +1,15 @@
+{
+  "name": "Verde · Salud de plantas",
+  "short_name": "Verde",
+  "description": "Guía personal de cuidado, tratamiento y prevención de patologías en plantas.",
+  "lang": "es",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8f6ee",
+  "theme_color": "#1b4d3c",
+  "orientation": "portrait",
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
