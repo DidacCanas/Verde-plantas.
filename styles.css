@@ -20,3 +20,36 @@ select { font-size: 16px; padding: 14px; }
 .bottom-nav a,
 .bottom-nav button { font-size: 13px; gap: 6px; }
 .bottom-nav span { font-size: 25px; line-height: 24px; }
+/* Barra inferior grande y más cómoda */
+.shell {
+  padding-bottom: 155px;
+}
+
+.bottom-nav {
+  min-height: 112px;
+  justify-content: space-around;
+  gap: 0;
+  padding: 14px 14px calc(20px + env(safe-area-inset-bottom));
+  background: rgba(255, 254, 250, 0.98);
+  box-shadow: 0 -5px 20px rgba(24, 54, 44, 0.08);
+}
+
+.bottom-nav a,
+.bottom-nav button {
+  min-width: 88px;
+  padding: 11px 12px;
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 600;
+  gap: 7px;
+}
+
+.bottom-nav span {
+  font-size: 29px;
+  line-height: 28px;
+}
+
+.bottom-nav .active {
+  background: #e3f0d9;
+  color: #1b4d3c;
+}
