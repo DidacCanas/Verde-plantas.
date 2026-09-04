@@ -1,0 +1,22 @@
+/* Vista más cercana y aprovechada en teléfonos. */
+@media (max-width: 699px) {
+  .shell {
+    max-width: none;
+    padding: 0 16px 100px;
+  }
+
+  .topbar { height: 70px; }
+  .hero { padding: 23px 1px 24px; }
+  .hero h1 { font-size: 46px; letter-spacing: -1.9px; }
+  .intro { font-size: 17px; max-width: 420px; }
+  .scan-card { border-radius: 19px; }
+  .photo-area { height: 220px; }
+  .form-body { padding: 21px 18px 19px; }
+  .field-label { font-size: 15px; }
+  select { font-size: 15px; padding: 12px 13px; }
+  .chip { font-size: 13px; padding: 9px 12px; }
+  .primary { font-size: 16px; padding: 15px 16px; }
+  .trust { font-size: 12px; margin-bottom: 34px; }
+  .section-title h2 { font-size: 30px; }
+  .empty-state { font-size: 14px; padding: 25px; }
+}
