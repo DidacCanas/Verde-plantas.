@@ -14,7 +14,38 @@ function renderModal(){ const d=selectedData(); $('#diagnosisIcon').textContent=
 function open(id){ renderHistory(); $('#'+id).hidden=false; document.body.style.overflow='hidden'; }
 function close(id){ $('#'+id).hidden=true; document.body.style.overflow=''; }
 document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('selected')); b.classList.add('selected');symptom=b.dataset.value;}));
-$('#photoInput').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return; imageFile=file; const img=$('#preview');img.src=URL.createObjectURL(file);img.hidden=false;$('#photoPlaceholder').style.display='none'; updateIdentifyButton();});
+$('#photoInput').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return; imageFile=file; const img=$('#preview');let previewUrl;
+
+$('#photoInput').addEventListener('change', event => {
+  const file = event.target.files?.[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    $('#speciesStatus').textContent = 'Selecciona una imagen válida.';
+    return;
+  }
+
+  if (file.size > 8 * 1024 * 1024) {
+    $('#speciesStatus').textContent =
+      'La imagen es demasiado grande. Máximo recomendado: 8 MB.';
+    return;
+  }
+
+  if (previewUrl) {
+    URL.revokeObjectURL(previewUrl);
+  }
+
+  imageFile = file;
+  previewUrl = URL.createObjectURL(file);
+
+  const image = $('#preview');
+  image.src = previewUrl;
+  image.hidden = false;
+  $('#photoPlaceholder').hidden = true;
+
+  updateIdentifyButton();
+});
 const keyInput = $('#plantnetKey');
 keyInput.value = localStorage.getItem('plantnetApiKey') || '';
 keyInput.addEventListener('input', () => { localStorage.setItem('plantnetApiKey', keyInput.value.trim()); updateIdentifyButton(); });
