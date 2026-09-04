@@ -110,26 +110,44 @@ select {
         <input id="photoInput" type="file" accept="image/*" capture="environment" />
       </div>
       <div class="form-body">
-        <div class="notice" style="margin-bottom:22px">
-          <b>Identificación automática de especie</b>
-          <span>Conecta gratis tu clave personal de Pl@ntNet para reconocer la planta a partir de la foto.</span>
-          <input id="plantnetKey" type="password" autocomplete="off" placeholder="Pega aquí tu clave de Pl@ntNet" style="width:100%;margin-top:9px;padding:10px;border:1px solid #d8cda9;border-radius:8px;background:#fffdf8;font:12px 'DM Sans',sans-serif" />
-          <button class="primary" id="identifySpeciesBtn" disabled style="margin-top:9px;padding:10px 12px;font-size:13px"><span>Identificar especie en la foto</span><b>⌁</b></button>
-          <span id="speciesStatus" aria-live="polite" style="margin-top:8px;color:#66756d">Añade una foto y tu clave para identificarla.</span>
-        </div>
-        <label class="field-label" for="plant">¿Qué planta es?</label>
-        <div class="select-wrap"><select id="plant"><option value="tomate">Tomate</option><option value="rosal">Rosal</option><option value="monstera">Monstera / interior</option><option value="pimiento">Pimiento</option><option value="otra">Otra planta</option></select></div>
-        <label class="field-label" for="symptom">Síntoma principal</label>
-        <div class="chips" id="symptom">
-          <button class="chip selected" data-value="manchas">Manchas en hojas</button>
-          <button class="chip" data-value="polvo">Polvo blanco</button>
-          <button class="chip" data-value="amarilleo">Hojas amarillas</button>
-          <button class="chip" data-value="insectos">Insectos visibles</button>
-        </div>
-        <button class="primary" id="analyzeBtn"><span>Analizar planta</span><b>→</b></button>
-      </div>
-    </section>
+        <section class="plantnet-box">
+  <button
+    class="plantnet-toggle"
+    id="plantnetToggle"
+    type="button"
+    aria-expanded="false"
+    aria-controls="plantnetContent"
+  >
+    <span>
+      <b>Identificación automática de especie</b>
+      <small>Opcional · usar Pl@ntNet</small>
+    </span>
+    <span class="toggle-icon">⌄</span>
+  </button>
 
+  <div id="plantnetContent" class="plantnet-content" hidden>
+    <p>
+      Conecta tu clave personal de Pl@ntNet para reconocer la planta a partir
+      de la foto.
+    </p>
+
+    <input
+      id="plantnetKey"
+      type="password"
+      autocomplete="off"
+      placeholder="Pega aquí tu clave de Pl@ntNet"
+    />
+
+    <button class="primary secondary-action" id="identifySpeciesBtn" disabled>
+      <span>Identificar especie en la foto</span>
+      <b>⌁</b>
+    </button>
+
+    <span id="speciesStatus" aria-live="polite">
+      Añade una foto y tu clave para identificarla.
+    </span>
+  </div>
+</section>
     <section class="trust"><span>✦</span> Orientación para el cuidado personal. Confirma siempre el diagnóstico y los productos autorizados en tu zona. Identificación de especie mediante <a href="https://my.plantnet.org/" target="_blank" rel="noopener">Pl@ntNet</a>.</section>
 
     <section class="today" id="todaySection">
