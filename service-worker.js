@@ -1,11 +1,12 @@
-const CACHE_NAME = 'verde-salud-v2';
+const CACHE_NAME = 'verde-salud-v3';
 const APP_FILES = [
   './',
   './index.html',
   './styles.css',
+  './mobile.css',
   './app.js',
   './manifest.webmanifest',
-  './icon.svg'
+  './app-icon.svg'
 ];
 
 self.addEventListener('install', event => {
