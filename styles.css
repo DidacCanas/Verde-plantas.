@@ -63,3 +63,33 @@ select { font-size: 16px; padding: 14px; }
 .topbar .brand {
   color: white;
 }
+.notice {
+  margin-bottom: 22px;
+}
+
+#plantnetKey {
+  width: 100%;
+  margin-top: 9px;
+}
+
+#identifySpeciesBtn {
+  margin-top: 9px;
+}
+.primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.primary.is-loading {
+  position: relative;
+  color: transparent;
+}
+
+.primary.is-loading::after {
+  content: "Identificando…";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: white;
+}
