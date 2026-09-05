@@ -1,157 +1,90 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#1d4d3b" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Verde" />
-  <title>Verde · Salud de plantas</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="app-icon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="mobile.css" />
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
-</head>
-<body>
-  <main class="shell">
-    <header class="topbar">
-      <a class="brand" href="#inicio" aria-label="Verde, inicio"><span class="brand-mark">⌁</span><span>verde</span></a>
-      <div class="header-actions">
-        <button id="installBtn" class="install-btn" hidden>↓ Instalar</button>
-        <button class="icon-btn" id="historyBtn" aria-label="Ver historial">◷<span class="dot" id="historyDot"></span></button>
-      </div>
-    </header>
+const CACHE_NAME = 'verde-salud-v9';
 
-    <section id="inicio" class="hero">
-      <p class="eyebrow">TU HUERTO, MÁS TRANQUILO</p>
-      <h1>Entiende lo que<br><em>necesita</em> tu planta.</h1>
-      <p class="intro">Haz una foto, registra los síntomas y recibe una guía práctica de cuidado.</p>
-    </section>
+const APP_FILES = [
+  './',
+  './index.html',
+  './styles.css',
+  './mobile.css',
+  './app.js',
+  './manifest.webmanifest',
+  './app-icon.svg'
+];
 
-    <section class="scan-card" aria-label="Nueva revisión">
-      <div class="photo-area" id="photoArea">
-        <img id="preview" alt="Vista previa de la planta" hidden />
-        <div class="photo-placeholder" id="photoPlaceholder"><span>⌁</span><p>Una foto nítida<br>de la zona afectada</p></div>
-        <label class="camera-button" for="photoInput">⌁ <span>Hacer foto</span></label>
-        <input id="photoInput" type="file" accept="image/*" capture="environment" />
-      </div>
-      <div class="form-body">
-        <div class="field-group">
-          <label class="field-label" for="plant">Planta</label>
-          <div class="select-wrap">
-            <select id="plant">
-              <option value="tomate">Tomate</option>
-              <option value="pimiento">Pimiento</option>
-              <option value="lechuga">Lechuga</option>
-              <option value="rosal">Rosal</option>
-              <option value="citrico">Cítrico</option>
-              <option value="otra">Otra</option>
-            </select>
-          </div>
-        </div>
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(async cache => {
+      for (const file of APP_FILES) {
+        try {
+          await cache.add(file);
+        } catch (error) {
+          console.warn('No se pudo cachear:', file, error);
+        }
+      }
+    })
+  );
 
-        <div class="field-group">
-          <span class="field-label">Síntoma principal</span>
-          <div class="chips">
-            <button class="chip selected" data-value="manchas">Manchas en hojas</button>
-            <button class="chip" data-value="polvo">Polvo blanco</button>
-            <button class="chip" data-value="amarilleo">Amarilleo</button>
-            <button class="chip" data-value="insectos">Insectos</button>
-          </div>
-        </div>
+  self.skipWaiting();
+});
 
-        <section class="plantnet-box">
-          <button class="plantnet-toggle" id="plantnetToggle" type="button" aria-expanded="false" aria-controls="plantnetContent">
-            <span>
-              <b>Identificación automática de especie</b>
-              <small>Opcional · usar Pl@ntNet</small>
-            </span>
-            <span class="toggle-icon">⌄</span>
-          </button>
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(names =>
+      Promise.all(
+        names
+          .filter(name => name !== CACHE_NAME)
+          .map(name => caches.delete(name))
+      )
+    ).then(() => self.clients.claim())
+  );
+});
 
-          <div id="plantnetContent" class="plantnet-content" hidden>
-            <p>Conecta tu clave personal de Pl@ntNet para reconocer la planta a partir de la foto.</p>
-            <input id="plantnetKey" type="password" autocomplete="off" placeholder="Pega aquí tu clave de Pl@ntNet" />
-            <button class="primary secondary-action" id="identifySpeciesBtn" disabled>
-              <span>Identificar especie en la foto</span>
-              <b>⌁</b>
-            </button>
-            <span id="speciesStatus" aria-live="polite">Añade una foto y tu clave para identificarla.</span>
-          </div>
-        </section>
+self.addEventListener('fetch', event => {
+  const request = event.request;
 
-        <button class="primary" id="analyzeBtn">
-          <span>Analizar síntoma</span>
-          <b>→</b>
-        </button>
+  if (request.method !== 'GET') return;
 
-        <section class="trust">
-          <span>✦</span> Orientación para el cuidado personal. Confirma siempre el diagnóstico y los productos autorizados en tu zona. Identificación de especie mediante <a href="https://my.plantnet.org/" target="_blank" rel="noopener">Pl@ntNet</a>.
-        </section>
-      </div>
-    </section>
+  const url = new URL(request.url);
 
-    <section class="today" id="todaySection">
-      <div class="section-title">
-        <div><p class="eyebrow">EN CURSO</p><h2>Tu plan de hoy</h2></div>
-        <span id="todayCount">0 tareas</span>
-      </div>
-      <div class="empty-state" id="emptyState">Aún no hay tratamientos activos.<br>Tu primera revisión aparecerá aquí.</div>
-      <div id="taskList" class="task-list"></div>
-    </section>
-  </main>
+  // No cachear peticiones externas, como Pl@ntNet
+  if (url.origin !== self.location.origin) {
+    return;
+  }
 
-  <nav class="bottom-nav" aria-label="Navegación principal">
-    <a class="active" href="#inicio"><span>⌂</span>Inicio</a>
-    <a href="#todaySection"><span>✓</span>Plan</a>
-    <button id="openHistory"><span>◷</span>Historial</button>
-  </nav>
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          const copy = response.clone();
 
-  <div class="modal-backdrop" id="resultModal" hidden>
-    <section class="modal result-modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
-      <button class="close" data-close="resultModal" aria-label="Cerrar">×</button>
-      <p class="eyebrow">RESULTADO ORIENTATIVO</p>
-      <div class="result-heading">
-        <span class="diagnosis-icon" id="diagnosisIcon">◌</span>
-        <div><h2 id="resultTitle">Posible patología</h2><p id="confidence">Coincidencia orientativa</p></div>
-      </div>
-      <p class="result-copy" id="diagnosisCopy"></p>
-      <div class="notice"><b>Antes de tratar</b><span id="checkFirst"></span></div>
-      <div class="plan-head">
-        <div><p class="eyebrow">PLAN PROPUESTO</p><h3>Próximos 14 días</h3></div>
-        <span class="pill">3 pasos</span>
-      </div>
-      <ol class="timeline" id="timeline"></ol>
-      <div class="prevention">
-        <p class="eyebrow">DESPUÉS DE RECUPERARLA</p>
-        <h3>Plan de prevención</h3>
-        <ul id="preventionList"></ul>
-      </div>
-      <button class="primary" id="savePlanBtn"><span>Guardar este plan</span><b>→</b></button>
-    </section>
-  </div>
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put('./index.html', copy);
+          });
 
-  <div class="modal-backdrop" id="historyModal" hidden>
-    <section class="modal history-modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
-      <button class="close" data-close="historyModal" aria-label="Cerrar">×</button>
-      <p class="eyebrow">TU CUADERNO</p>
-      <h2 id="historyTitle">Revisiones guardadas</h2>
-      <div id="historyList" class="history-list"></div>
-    </section>
-  </div>
+          return response;
+        })
+        .catch(() => caches.match('./index.html'))
+    );
 
-  <script src="app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));
-    }
-  </script>
-</body>
-</html>
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request).then(cached => {
+      if (cached) return cached;
+
+      return fetch(request).then(response => {
+        if (!response || response.status !== 200) {
+          return response;
+        }
+
+        const copy = response.clone();
+
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(request, copy);
+        });
+
+        return response;
+      });
+    })
+  );
+});
