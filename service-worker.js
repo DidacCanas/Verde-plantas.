@@ -1,10 +1,11 @@
-const CACHE_NAME = 'verde-salud-v10';
+const CACHE_NAME = 'verde-salud-v11';
 
 const APP_FILES = [
   './',
   './index.html',
   './styles.css',
   './mobile.css',
+  './improved-mobile.css',
   './app.js',
   './manifest.webmanifest',
   './app-icon.svg'
