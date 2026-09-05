@@ -1,90 +1,266 @@
-const CACHE_NAME = 'verde-salud-v9';
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1b4d3c">
+  <meta name="description" content="Diagnóstico y cuidados sencillos para tus plantas">
 
-const APP_FILES = [
-  './',
-  './index.html',
-  './styles.css',
-  './mobile.css',
-  './app.js',
-  './manifest.webmanifest',
-  './app-icon.svg'
-];
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./app-icon.svg" type="image/svg+xml">
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
-      for (const file of APP_FILES) {
-        try {
-          await cache.add(file);
-        } catch (error) {
-          console.warn('No se pudo cachear:', file, error);
-        }
-      }
-    })
-  );
+  <title>Verde Salud</title>
 
-  self.skipWaiting();
-});
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(names =>
-      Promise.all(
-        names
-          .filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
-      )
-    ).then(() => self.clients.claim())
-  );
-});
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./mobile.css">
+</head>
 
-self.addEventListener('fetch', event => {
-  const request = event.request;
+<body>
+  <div class="shell">
 
-  if (request.method !== 'GET') return;
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Verde Salud">
+        <span class="brand-mark">✦</span>
+        Verde
+      </a>
 
-  const url = new URL(request.url);
+      <div class="header-actions">
+        <button id="installBtn" class="install-btn" type="button" hidden>
+          Instalar
+        </button>
 
-  // No cachear peticiones externas, como Pl@ntNet
-  if (url.origin !== self.location.origin) {
-    return;
-  }
+        <button id="historyBtn" class="icon-btn" type="button" aria-label="Ver historial">
+          ◷
+          <span id="historyDot" class="dot"></span>
+        </button>
+      </div>
+    </header>
 
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          const copy = response.clone();
+    <main>
+      <section class="hero">
+        <p class="eyebrow">CUIDADO DE PLANTAS</p>
 
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put('./index.html', copy);
+        <h1>
+          Entiende qué le pasa<br>
+          a tu <em>planta</em>.
+        </h1>
+
+        <p class="intro">
+          Sube una foto, describe los síntomas y recibe una guía sencilla para actuar.
+        </p>
+      </section>
+
+      <section class="scan-card" aria-label="Analizar planta">
+        <div class="photo-area">
+          <img id="preview" alt="Vista previa de la planta" hidden>
+
+          <div id="photoPlaceholder" class="photo-placeholder">
+            <span>⌁</span>
+            <p>Añade una foto de tu planta<br>para empezar</p>
+          </div>
+
+          <label class="camera-button" for="photoInput">
+            📷 Elegir foto
+          </label>
+
+          <input id="photoInput" type="file" accept="image/*">
+        </div>
+
+        <div class="form-body">
+          <div class="field-group">
+            <label class="field-label" for="plant">
+              ¿Qué planta es?
+            </label>
+
+            <div class="select-wrap">
+              <select id="plant">
+                <option value="">Selecciona una planta</option>
+                <option value="monstera">Monstera</option>
+                <option value="pothos">Poto</option>
+                <option value="ficus">Ficus</option>
+                <option value="sansevieria">Sansevieria</option>
+                <option value="rosal">Rosal</option>
+                <option value="tomate">Tomatera</option>
+                <option value="otra">Otra planta</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <span class="field-label">¿Qué observas?</span>
+
+            <div class="chips">
+              <button class="chip selected" type="button" data-value="manchas">
+                Manchas
+              </button>
+
+              <button class="chip" type="button" data-value="polvo">
+                Polvo blanco
+              </button>
+
+              <button class="chip" type="button" data-value="amarilleo">
+                Hojas amarillas
+              </button>
+
+              <button class="chip" type="button" data-value="insectos">
+                Insectos
+              </button>
+            </div>
+          </div>
+
+          <div class="plantnet-box">
+            <button
+              id="plantnetToggle"
+              class="plantnet-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-controls="plantnetContent"
+            >
+              <span>
+                <b>Identificar especie con la foto</b>
+                <small>Opcional · usa Pl@ntNet</small>
+              </span>
+
+              <span class="toggle-icon">⌄</span>
+            </button>
+
+            <div id="plantnetContent" class="plantnet-content" hidden>
+              <p>
+                Puedes introducir tu clave de API de Pl@ntNet para intentar
+                identificar automáticamente la especie de la planta.
+              </p>
+
+              <input
+                id="plantnetKey"
+                type="password"
+                autocomplete="off"
+                placeholder="Clave API de Pl@ntNet"
+              >
+
+              <button
+                id="identifySpeciesBtn"
+                class="primary secondary-action"
+                type="button"
+                disabled
+              >
+                <span>Identificar especie en la foto</span>
+                <b>→</b>
+              </button>
+
+              <span id="speciesStatus"></span>
+            </div>
+          </div>
+
+          <button id="analyzeBtn" class="primary" type="button">
+            <span>Analizar síntomas</span>
+            <b>→</b>
+          </button>
+
+          <p class="trust">
+            <span>✦</span>
+            La orientación es informativa y no sustituye el diagnóstico de un especialista.
+          </p>
+        </div>
+      </section>
+
+      <section id="todaySection" class="today">
+        <div class="section-title">
+          <h2>Para hoy</h2>
+          <span id="todayCount">0 tareas</span>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+          Todavía no tienes tareas pendientes.
+          Guarda un plan después de analizar tu planta.
+        </div>
+
+        <div id="taskList" class="task-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <a href="./" class="active">
+      <span>⌂</span>
+      Inicio
+    </a>
+
+    <button id="openHistory" type="button">
+      <span>◷</span>
+      Historial
+    </button>
+  </nav>
+
+  <!-- Modal de resultado -->
+  <div id="resultModal" class="modal-backdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <button class="close" type="button" data-close aria-label="Cerrar">
+        ×
+      </button>
+
+      <div class="result-heading">
+        <div id="diagnosisIcon" class="diagnosis-icon">◌</div>
+
+        <div>
+          <h2 id="resultTitle">Resultado</h2>
+          <p id="confidence"></p>
+        </div>
+      </div>
+
+      <p id="diagnosisCopy" class="result-copy"></p>
+
+      <div class="notice">
+        <b>Antes de actuar</b>
+        <span id="checkFirst"></span>
+      </div>
+
+      <div class="plan-head">
+        <h3>Plan de cuidados</h3>
+        <span class="pill">GUÍA</span>
+      </div>
+
+      <ul id="timeline" class="timeline"></ul>
+
+      <div class="prevention">
+        <h3>Para prevenir</h3>
+        <ul id="preventionList"></ul>
+      </div>
+
+      <button id="savePlanBtn" class="primary" type="button">
+        <span>Guardar este plan</span>
+        <b>→</b>
+      </button>
+    </section>
+  </div>
+
+  <!-- Modal de historial -->
+  <div id="historyModal" class="modal-backdrop" hidden>
+    <section class="modal history-modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+      <button class="close" type="button" data-close aria-label="Cerrar">
+        ×
+      </button>
+
+      <h2 id="historyTitle">Historial</h2>
+
+      <div id="historyList" class="history-list"></div>
+    </section>
+  </div>
+
+  <script src="./app.js"></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .catch(error => {
+            console.warn('No se pudo registrar el service worker:', error);
           });
-
-          return response;
-        })
-        .catch(() => caches.match('./index.html'))
-    );
-
-    return;
-  }
-
-  event.respondWith(
-    caches.match(request).then(cached => {
-      if (cached) return cached;
-
-      return fetch(request).then(response => {
-        if (!response || response.status !== 200) {
-          return response;
-        }
-
-        const copy = response.clone();
-
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(request, copy);
-        });
-
-        return response;
       });
-    })
-  );
-});
+    }
+  </script>
+</body>
+</html>
