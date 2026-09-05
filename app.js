@@ -26,15 +26,20 @@ function renderModal(){
   $('#preventionList').innerHTML = d.prevent.map(p => `<li>${p}</li>`).join('');
 }
 
+function closeAllModals(){
+  document.querySelectorAll('.modal-backdrop').forEach(modal => { modal.hidden = true; });
+  document.body.style.overflow = '';
+}
+
 function open(id){
-  renderHistory();
+  closeAllModals();
+  if (id === 'historyModal') renderHistory();
   $('#' + id).hidden = false;
   document.body.style.overflow = 'hidden';
 }
 
-function close(id){
-  $('#' + id).hidden = true;
-  document.body.style.overflow = '';
+function close(){
+  closeAllModals();
 }
 
 document.querySelectorAll('.chip').forEach(b =>
@@ -136,12 +141,16 @@ $('#analyzeBtn').addEventListener('click', () => {
 });
 
 document.querySelectorAll('[data-close]').forEach(b =>
-  b.addEventListener('click', () => close(b.dataset.close))
+  b.addEventListener('click', close)
 );
 
 document.querySelectorAll('.modal-backdrop').forEach(m =>
-  m.addEventListener('click', e => { if (e.target === m) close(m.id); })
+  m.addEventListener('click', e => { if (e.target === m) close(); })
 );
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') close();
+});
 
 $('#historyBtn').addEventListener('click', () => open('historyModal'));
 $('#openHistory').addEventListener('click', () => open('historyModal'));
@@ -162,7 +171,7 @@ $('#savePlanBtn').addEventListener('click', () => {
   const plans = getPlans();
   plans.unshift(p);
   setPlans(plans);
-  close('resultModal');
+  close();
   renderTasks();
   $('#todaySection').scrollIntoView({ behavior: 'smooth' });
 });
