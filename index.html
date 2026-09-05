@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#1b4d3c">
-  <meta name="description" content="Diagnóstico y cuidados sencillos para tus plantas">
 
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./app-icon.svg" type="image/svg+xml">
@@ -13,10 +12,15 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap"
+    rel="stylesheet"
+  >
 
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./mobile.css">
+  <link rel="stylesheet" href="./improved-mobile.css">
 </head>
 
 <body>
@@ -50,27 +54,35 @@
         </h1>
 
         <p class="intro">
-          Sube una foto, describe los síntomas y recibe una guía sencilla para actuar.
+          Haz una foto y recibe una orientación sencilla sobre el estado de tu planta.
         </p>
       </section>
 
       <section class="scan-card" aria-label="Analizar planta">
+
         <div class="photo-area">
-          <img id="preview" alt="Vista previa de la planta" hidden>
+          <img id="preview" alt="Foto de la planta" hidden>
 
           <div id="photoPlaceholder" class="photo-placeholder">
             <span>⌁</span>
-            <p>Añade una foto de tu planta<br>para empezar</p>
+            <p>Haz una foto clara de las hojas<br>y el tallo de tu planta</p>
           </div>
 
           <label class="camera-button" for="photoInput">
-            📷 Elegir foto
+            📷 Hacer foto
           </label>
 
-          <input id="photoInput" type="file" accept="image/*">
+          <!-- capture="environment" abre la cámara trasera del móvil -->
+          <input
+            id="photoInput"
+            type="file"
+            accept="image/*"
+            capture="environment"
+          >
         </div>
 
         <div class="form-body">
+
           <div class="field-group">
             <label class="field-label" for="plant">
               ¿Qué planta es?
@@ -91,7 +103,12 @@
           </div>
 
           <div class="field-group">
-            <span class="field-label">¿Qué observas?</span>
+            <span class="field-label">Síntomas observados</span>
+
+            <p class="automatic-note">
+              Los síntomas se intentarán detectar automáticamente a partir de la foto.
+              Puedes corregirlos manualmente si el resultado no coincide.
+            </p>
 
             <div class="chips">
               <button class="chip selected" type="button" data-value="manchas">
@@ -110,6 +127,10 @@
                 Insectos
               </button>
             </div>
+
+            <p id="photoAnalysisStatus" class="photo-analysis-status">
+              Esperando una fotografía.
+            </p>
           </div>
 
           <div class="plantnet-box">
@@ -130,8 +151,8 @@
 
             <div id="plantnetContent" class="plantnet-content" hidden>
               <p>
-                Puedes introducir tu clave de API de Pl@ntNet para intentar
-                identificar automáticamente la especie de la planta.
+                Puedes introducir tu clave de Pl@ntNet para intentar identificar
+                automáticamente la especie.
               </p>
 
               <input
@@ -147,7 +168,7 @@
                 type="button"
                 disabled
               >
-                <span>Identificar especie en la foto</span>
+                <span>Identificar especie</span>
                 <b>→</b>
               </button>
 
@@ -156,7 +177,7 @@
           </div>
 
           <button id="analyzeBtn" class="primary" type="button">
-            <span>Analizar síntomas</span>
+            <span>Ver análisis de la planta</span>
             <b>→</b>
           </button>
 
@@ -195,12 +216,9 @@
     </button>
   </nav>
 
-  <!-- Modal de resultado -->
   <div id="resultModal" class="modal-backdrop" hidden>
     <section class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
-      <button class="close" type="button" data-close aria-label="Cerrar">
-        ×
-      </button>
+      <button class="close" type="button" data-close aria-label="Cerrar">×</button>
 
       <div class="result-heading">
         <div id="diagnosisIcon" class="diagnosis-icon">◌</div>
@@ -237,15 +255,10 @@
     </section>
   </div>
 
-  <!-- Modal de historial -->
   <div id="historyModal" class="modal-backdrop" hidden>
     <section class="modal history-modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
-      <button class="close" type="button" data-close aria-label="Cerrar">
-        ×
-      </button>
-
+      <button class="close" type="button" data-close aria-label="Cerrar">×</button>
       <h2 id="historyTitle">Historial</h2>
-
       <div id="historyList" class="history-list"></div>
     </section>
   </div>
