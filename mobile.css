@@ -1,6 +1,6 @@
-@media (max-width: 767px) {
+@media (max-width: 1100px) {
   :root {
-    --mobile-padding: 12px;
+    --mobile-padding: 8px;
   }
 
   body {
@@ -10,13 +10,13 @@
   .shell {
     width: 100%;
     max-width: none;
-    padding: 0 var(--mobile-padding) calc(104px + env(safe-area-inset-bottom));
+    padding: 0 var(--mobile-padding) calc(132px + env(safe-area-inset-bottom));
   }
 
   .topbar {
     height: 64px;
-    margin: 0 -12px;
-    padding: 0 12px;
+    margin: 0 -8px;
+    padding: 0 8px;
     background: var(--forest-700);
   }
 
@@ -40,7 +40,7 @@
   }
 
   .hero {
-    padding: 28px 2px 22px;
+    padding: 28px 0 22px;
   }
 
   .eyebrow {
@@ -49,20 +49,21 @@
   }
 
   .hero h1 {
-    max-width: 350px;
+    max-width: 100%;
     font-size: clamp(35px, 10vw, 43px);
     line-height: 1;
     letter-spacing: -1.6px;
   }
 
   .intro {
-    max-width: 350px;
+    max-width: 100%;
     margin-top: 14px;
     font-size: 15px;
     line-height: 1.45;
   }
 
   .scan-card {
+    width: 100%;
     border-radius: 17px;
     box-shadow: 0 7px 20px rgba(41, 67, 51, 0.08);
   }
@@ -87,7 +88,7 @@
   }
 
   .form-body {
-    padding: 20px 16px 20px;
+    padding: 20px 12px 20px;
   }
 
   .field-group {
@@ -147,7 +148,7 @@
   }
 
   .trust {
-    margin: 14px 3px 28px;
+    margin: 14px 0 28px;
     font-size: 10px;
   }
 
@@ -170,26 +171,26 @@
   }
 
   .bottom-nav {
-    min-height: 88px;
+    min-height: 108px;
     justify-content: space-around;
     gap: 0;
-    padding: 12px 10px calc(12px + env(safe-area-inset-bottom));
+    padding: 14px 8px calc(18px + env(safe-area-inset-bottom));
     background: rgba(255, 254, 250, 0.97);
     box-shadow: 0 -5px 18px rgba(24, 54, 44, 0.08);
   }
 
   .bottom-nav a,
   .bottom-nav button {
-    min-width: 72px;
-    padding: 8px 10px;
-    border-radius: 14px;
-    font-size: 12px;
-    gap: 5px;
+    min-width: 88px;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    gap: 6px;
   }
 
   .bottom-nav span {
-    font-size: 24px;
-    line-height: 23px;
+    font-size: 28px;
+    line-height: 27px;
   }
 
   .bottom-nav .active {
