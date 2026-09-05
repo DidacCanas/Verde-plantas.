@@ -3,6 +3,7 @@ let symptom = 'manchas';
 let installPrompt;
 let imageFile;
 let previewUrl;
+let photoAnalysisResult = null;
 
 const db = {
   manchas: {name:'Mancha foliar (posible hongo)', icon:'◌', confidence:'Patrón compatible · confirmar de cerca', copy:'Las manchas suelen aparecer cuando las hojas permanecen húmedas o el aire circula poco. Retira las hojas muy afectadas y observa si las lesiones avanzan.', check:'Comprueba el reverso de las hojas y evita tratar si hay lluvia, mucho calor o viento.', steps:[['Hoy','Sanea y aísla','Retira hojas afectadas con tijeras limpias. No las compostes. Riega solo el sustrato.'],['Día 3','Tratamiento preventivo','Si el problema avanza, consulta un producto fungicida autorizado para tu planta (por ejemplo, cobre o bicarbonato potásico) y sigue estrictamente la etiqueta.'],['Día 10','Revisión y repetición','Revisa los brotes nuevos. Repite solo si la etiqueta del producto y el estado de la planta lo indican.']], prevent:['Riega a primera hora y siempre a nivel del sustrato.','Deja espacio entre plantas para que circule el aire.','Revisa hojas nuevas una vez a la semana y retira las caídas.']},
@@ -50,21 +51,28 @@ document.querySelectorAll('.chip').forEach(b =>
   })
 );
 
-$('#photoInput').addEventListener('change', event => {
+$('#photoInput').addEventListener('change', async event => {
   const file = event.target.files?.[0];
-  if (!file) return;
+
+  if (!file) {
+    return;
+  }
 
   if (!file.type.startsWith('image/')) {
-    $('#speciesStatus').textContent = 'Selecciona una imagen válida.';
+    $('#photoAnalysisStatus').textContent =
+      'Selecciona una imagen válida.';
     return;
   }
 
   if (file.size > 8 * 1024 * 1024) {
-    $('#speciesStatus').textContent = 'La imagen es demasiado grande. Máximo recomendado: 8 MB.';
+    $('#photoAnalysisStatus').textContent =
+      'La imagen es demasiado grande. Máximo recomendado: 8 MB.';
     return;
   }
 
-  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  if (previewUrl) {
+    URL.revokeObjectURL(previewUrl);
+  }
 
   imageFile = file;
   previewUrl = URL.createObjectURL(file);
@@ -72,10 +80,136 @@ $('#photoInput').addEventListener('change', event => {
   const image = $('#preview');
   image.src = previewUrl;
   image.hidden = false;
+
   $('#photoPlaceholder').hidden = true;
+
+  $('#photoAnalysisStatus').textContent =
+    'Foto recibida. Analizando síntomas…';
+
+  await analyzePhotoLocally();
 
   updateIdentifyButton();
 });
+async function analyzePhotoLocally() {
+  if (!imageFile) {
+    return;
+  }
+
+  try {
+    const image = new Image();
+
+    image.src = previewUrl;
+
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = reject;
+    });
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+
+    const maxSize = 320;
+    const scale = Math.min(
+      maxSize / image.width,
+      maxSize / image.height,
+      1
+    );
+
+    canvas.width = Math.max(1, Math.round(image.width * scale));
+    canvas.height = Math.max(1, Math.round(image.height * scale));
+
+    context.drawImage(
+      image,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    const pixels = context.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    ).data;
+
+    let yellowPixels = 0;
+    let whitePixels = 0;
+    let darkPixels = 0;
+    let totalPixels = pixels.length / 4;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+      const red = pixels[i];
+      const green = pixels[i + 1];
+      const blue = pixels[i + 2];
+
+      const isYellow =
+        red > 120 &&
+        green > 100 &&
+        red > blue * 1.25 &&
+        green > blue * 1.15;
+
+      const isWhite =
+        red > 175 &&
+        green > 175 &&
+        blue > 175 &&
+        Math.abs(red - green) < 45 &&
+        Math.abs(green - blue) < 45;
+
+      const isDark =
+        red < 80 &&
+        green < 80 &&
+        blue < 80;
+
+      if (isYellow) yellowPixels++;
+      if (isWhite) whitePixels++;
+      if (isDark) darkPixels++;
+    }
+
+    const yellowRatio = yellowPixels / totalPixels;
+    const whiteRatio = whitePixels / totalPixels;
+    const darkRatio = darkPixels / totalPixels;
+
+    /*
+     * Es una orientación visual básica, no un diagnóstico médico
+     * ni un sistema profesional de detección de enfermedades.
+     */
+    if (whiteRatio > 0.18) {
+      symptom = 'polvo';
+    } else if (yellowRatio > 0.12) {
+      symptom = 'amarilleo';
+    } else if (darkRatio > 0.2) {
+      symptom = 'manchas';
+    } else {
+      symptom = 'manchas';
+    }
+
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.classList.toggle(
+        'selected',
+        chip.dataset.value === symptom
+      );
+    });
+
+    photoAnalysisResult = symptom;
+
+    const symptomNames = {
+      manchas: 'posibles manchas',
+      polvo: 'posible polvo blanco',
+      amarilleo: 'posible amarilleo',
+      insectos: 'posibles daños de insectos'
+    };
+
+    $('#photoAnalysisStatus').textContent =
+      `Análisis preliminar: ${symptomNames[symptom]}. ` +
+      'Puedes corregirlo manualmente.';
+  } catch (error) {
+    console.error('Error analizando la fotografía:', error);
+
+    $('#photoAnalysisStatus').textContent =
+      'No se pudo analizar automáticamente. Selecciona el síntoma manualmente.';
+  }
+}
 
 const keyInput = $('#plantnetKey');
 
@@ -145,6 +279,12 @@ $('#identifySpeciesBtn').addEventListener('click', async () => {
 });
 
 $('#analyzeBtn').addEventListener('click', () => {
+  if (!imageFile) {
+    $('#photoAnalysisStatus').textContent =
+      'Primero haz una fotografía de la planta.';
+    return;
+  }
+
   renderModal();
   open('resultModal');
 });
