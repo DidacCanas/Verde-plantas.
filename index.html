@@ -15,85 +15,18 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="mobile.css" />
-  <style>.modal-backdrop[hidden]{display:none!important}/* Formulario central más grande y fácil de leer */
-.form-body {
-  padding: 26px 20px 24px;
-}
-
-.notice {
-  padding: 15px;
-  font-size: 15px;
-}
-
-.notice b {
-  font-size: 15px;
-}
-
-#plantnetKey {
-  font-size: 16px !important;
-  padding: 13px !important;
-}
-
-#speciesStatus {
-  font-size: 14px !important;
-}
-
-.field-label {
-  font-size: 16px;
-  margin-bottom: 11px;
-}
-
-select {
-  font-size: 16px;
-  padding: 14px;
-}
-
-.chip {
-  font-size: 14px;
-  padding: 10px 13px;
-}
-
-.primary {
-  font-size: 17px;
-  padding: 17px;
-}
-
-.trust {
-  font-size: 13px;
-}
-
-.section-title h2 {
-  font-size: 32px;
-}
-
-.empty-state {
-  font-size: 15px;
-  padding: 28px;
-}
-
-/* Barra inferior más grande */
-.bottom-nav {
-  min-height: 88px;
-  padding-top: 14px;
-  padding-bottom: 22px;
-}
-
-.bottom-nav a,
-.bottom-nav button {
-  font-size: 13px;
-  gap: 6px;
-}
-
-.bottom-nav span {
-  font-size: 25px;
-  line-height: 24px;
-}</style>
+  <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
   <main class="shell">
     <header class="topbar">
       <a class="brand" href="#inicio" aria-label="Verde, inicio"><span class="brand-mark">⌁</span><span>verde</span></a>
-      <div class="header-actions" style="display:flex;align-items:center;gap:8px"><button id="installBtn" hidden style="border:1px solid #b3cbb2;background:#e6f1df;color:#24543e;border-radius:99px;padding:8px 11px;font:600 12px 'DM Sans',sans-serif;cursor:pointer">↓ Instalar</button><button class="icon-btn" id="historyBtn" aria-label="Ver historial">◷<span class="dot" id="historyDot"></span></button></div>
+      <div class="header-actions">
+        <button id="installBtn" class="install-btn" hidden>↓ Instalar</button>
+        <button class="icon-btn" id="historyBtn" aria-label="Ver historial">◷<span class="dot" id="historyDot"></span></button>
+      </div>
     </header>
 
     <section id="inicio" class="hero">
@@ -110,48 +43,66 @@ select {
         <input id="photoInput" type="file" accept="image/*" capture="environment" />
       </div>
       <div class="form-body">
+        <div class="field-group">
+          <label class="field-label" for="plant">Planta</label>
+          <div class="select-wrap">
+            <select id="plant">
+              <option value="tomate">Tomate</option>
+              <option value="pimiento">Pimiento</option>
+              <option value="lechuga">Lechuga</option>
+              <option value="rosal">Rosal</option>
+              <option value="citrico">Cítrico</option>
+              <option value="otra">Otra</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <span class="field-label">Síntoma principal</span>
+          <div class="chips">
+            <button class="chip selected" data-value="manchas">Manchas en hojas</button>
+            <button class="chip" data-value="polvo">Polvo blanco</button>
+            <button class="chip" data-value="amarilleo">Amarilleo</button>
+            <button class="chip" data-value="insectos">Insectos</button>
+          </div>
+        </div>
+
         <section class="plantnet-box">
-  <button
-    class="plantnet-toggle"
-    id="plantnetToggle"
-    type="button"
-    aria-expanded="false"
-    aria-controls="plantnetContent"
-  >
-    <span>
-      <b>Identificación automática de especie</b>
-      <small>Opcional · usar Pl@ntNet</small>
-    </span>
-    <span class="toggle-icon">⌄</span>
-  </button>
+          <button class="plantnet-toggle" id="plantnetToggle" type="button" aria-expanded="false" aria-controls="plantnetContent">
+            <span>
+              <b>Identificación automática de especie</b>
+              <small>Opcional · usar Pl@ntNet</small>
+            </span>
+            <span class="toggle-icon">⌄</span>
+          </button>
 
-  <div id="plantnetContent" class="plantnet-content" hidden>
-    <p>
-      Conecta tu clave personal de Pl@ntNet para reconocer la planta a partir
-      de la foto.
-    </p>
+          <div id="plantnetContent" class="plantnet-content" hidden>
+            <p>Conecta tu clave personal de Pl@ntNet para reconocer la planta a partir de la foto.</p>
+            <input id="plantnetKey" type="password" autocomplete="off" placeholder="Pega aquí tu clave de Pl@ntNet" />
+            <button class="primary secondary-action" id="identifySpeciesBtn" disabled>
+              <span>Identificar especie en la foto</span>
+              <b>⌁</b>
+            </button>
+            <span id="speciesStatus" aria-live="polite">Añade una foto y tu clave para identificarla.</span>
+          </div>
+        </section>
 
-    <input
-      id="plantnetKey"
-      type="password"
-      autocomplete="off"
-      placeholder="Pega aquí tu clave de Pl@ntNet"
-    />
+        <button class="primary" id="analyzeBtn">
+          <span>Analizar síntoma</span>
+          <b>→</b>
+        </button>
 
-    <button class="primary secondary-action" id="identifySpeciesBtn" disabled>
-      <span>Identificar especie en la foto</span>
-      <b>⌁</b>
-    </button>
-
-    <span id="speciesStatus" aria-live="polite">
-      Añade una foto y tu clave para identificarla.
-    </span>
-  </div>
-</section>
-    <section class="trust"><span>✦</span> Orientación para el cuidado personal. Confirma siempre el diagnóstico y los productos autorizados en tu zona. Identificación de especie mediante <a href="https://my.plantnet.org/" target="_blank" rel="noopener">Pl@ntNet</a>.</section>
+        <section class="trust">
+          <span>✦</span> Orientación para el cuidado personal. Confirma siempre el diagnóstico y los productos autorizados en tu zona. Identificación de especie mediante <a href="https://my.plantnet.org/" target="_blank" rel="noopener">Pl@ntNet</a>.
+        </section>
+      </div>
+    </section>
 
     <section class="today" id="todaySection">
-      <div class="section-title"><div><p class="eyebrow">EN CURSO</p><h2>Tu plan de hoy</h2></div><span id="todayCount">0 tareas</span></div>
+      <div class="section-title">
+        <div><p class="eyebrow">EN CURSO</p><h2>Tu plan de hoy</h2></div>
+        <span id="todayCount">0 tareas</span>
+      </div>
       <div class="empty-state" id="emptyState">Aún no hay tratamientos activos.<br>Tu primera revisión aparecerá aquí.</div>
       <div id="taskList" class="task-list"></div>
     </section>
@@ -167,12 +118,22 @@ select {
     <section class="modal result-modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
       <button class="close" data-close="resultModal" aria-label="Cerrar">×</button>
       <p class="eyebrow">RESULTADO ORIENTATIVO</p>
-      <div class="result-heading"><span class="diagnosis-icon" id="diagnosisIcon">◌</span><div><h2 id="resultTitle">Posible patología</h2><p id="confidence">Coincidencia orientativa</p></div></div>
+      <div class="result-heading">
+        <span class="diagnosis-icon" id="diagnosisIcon">◌</span>
+        <div><h2 id="resultTitle">Posible patología</h2><p id="confidence">Coincidencia orientativa</p></div>
+      </div>
       <p class="result-copy" id="diagnosisCopy"></p>
       <div class="notice"><b>Antes de tratar</b><span id="checkFirst"></span></div>
-      <div class="plan-head"><div><p class="eyebrow">PLAN PROPUESTO</p><h3>Próximos 14 días</h3></div><span class="pill">3 pasos</span></div>
+      <div class="plan-head">
+        <div><p class="eyebrow">PLAN PROPUESTO</p><h3>Próximos 14 días</h3></div>
+        <span class="pill">3 pasos</span>
+      </div>
       <ol class="timeline" id="timeline"></ol>
-      <div class="prevention"><p class="eyebrow">DESPUÉS DE RECUPERARLA</p><h3>Plan de prevención</h3><ul id="preventionList"></ul></div>
+      <div class="prevention">
+        <p class="eyebrow">DESPUÉS DE RECUPERARLA</p>
+        <h3>Plan de prevención</h3>
+        <ul id="preventionList"></ul>
+      </div>
       <button class="primary" id="savePlanBtn"><span>Guardar este plan</span><b>→</b></button>
     </section>
   </div>
@@ -180,10 +141,12 @@ select {
   <div class="modal-backdrop" id="historyModal" hidden>
     <section class="modal history-modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
       <button class="close" data-close="historyModal" aria-label="Cerrar">×</button>
-      <p class="eyebrow">TU CUADERNO</p><h2 id="historyTitle">Revisiones guardadas</h2>
+      <p class="eyebrow">TU CUADERNO</p>
+      <h2 id="historyTitle">Revisiones guardadas</h2>
       <div id="historyList" class="history-list"></div>
     </section>
   </div>
+
   <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

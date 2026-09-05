@@ -10,15 +10,14 @@
   .shell {
     width: 100%;
     max-width: none;
-    padding: 0 var(--mobile-padding)
-      calc(92px + env(safe-area-inset-bottom));
+    padding: 0 var(--mobile-padding) calc(88px + env(safe-area-inset-bottom));
   }
 
   .topbar {
     height: 64px;
     margin: 0 -16px;
     padding: 0 16px;
-    background: var(--forest);
+    background: var(--forest-700);
   }
 
   .brand {
@@ -88,45 +87,16 @@
   }
 
   .form-body {
-    padding: 18px 16px 17px;
+    padding: 20px 16px 20px;
   }
 
-  .notice {
-    gap: 5px;
-    margin-bottom: 19px !important;
-    padding: 14px;
-    border-radius: 12px;
-    font-size: 12px;
-    line-height: 1.4;
-  }
-
-  .notice b {
-    font-size: 13px;
-  }
-
-  #plantnetKey {
-    min-height: 45px;
-    padding: 11px !important;
-    font-size: 14px !important;
-  }
-
-  #identifySpeciesBtn {
-    min-height: 45px;
-    padding: 11px 12px !important;
-    font-size: 12px !important;
-  }
-
-  #speciesStatus {
-    font-size: 12px !important;
+  .field-group {
+    margin-bottom: 20px;
   }
 
   .field-label {
     margin-bottom: 8px;
     font-size: 14px;
-  }
-
-  .select-wrap {
-    margin-bottom: 19px;
   }
 
   select {
@@ -137,12 +107,11 @@
 
   .chips {
     gap: 7px;
-    margin-bottom: 19px;
   }
 
   .chip {
     min-height: 39px;
-    padding: 9px 11px;
+    padding: 9px 12px;
     font-size: 12px;
   }
 
@@ -157,8 +126,28 @@
     font-size: 19px;
   }
 
+  .plantnet-box {
+    margin-bottom: 20px;
+  }
+
+  #plantnetKey {
+    min-height: 45px;
+    padding: 11px;
+    font-size: 14px;
+  }
+
+  #identifySpeciesBtn {
+    min-height: 45px;
+    padding: 11px 12px;
+    font-size: 12px;
+  }
+
+  #speciesStatus {
+    font-size: 12px;
+  }
+
   .trust {
-    margin: 14px 3px 31px;
+    margin: 14px 3px 28px;
     font-size: 10px;
   }
 
@@ -181,10 +170,10 @@
   }
 
   .bottom-nav {
-    min-height: 70px;
+    min-height: 64px;
     justify-content: space-around;
     gap: 0;
-    padding: 7px 10px calc(7px + env(safe-area-inset-bottom));
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
     background: rgba(255, 254, 250, 0.97);
     box-shadow: 0 -5px 18px rgba(24, 54, 44, 0.08);
   }
@@ -204,7 +193,8 @@
   }
 
   .bottom-nav .active {
-    background: transparent;
+    background: #e3f0d9;
+    color: var(--forest-700);
   }
 
   .modal {
