@@ -1,6 +1,6 @@
 @media (max-width: 1100px) {
   :root {
-    --mobile-padding: 8px;
+    --mobile-padding: 10px;
   }
 
   body {
@@ -10,13 +10,13 @@
   .shell {
     width: 100%;
     max-width: none;
-    padding: 0 var(--mobile-padding) calc(132px + env(safe-area-inset-bottom));
+    padding: 0 var(--mobile-padding) calc(88px + env(safe-area-inset-bottom, 0px));
   }
 
   .topbar {
-    height: 64px;
-    margin: 0 -8px;
-    padding: 0 8px;
+    height: 52px;
+    margin: 0 calc(-1 * var(--mobile-padding));
+    padding: 0 var(--mobile-padding);
     background: var(--forest-700);
   }
 
@@ -32,165 +32,178 @@
   }
 
   .icon-btn {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-color: rgba(255, 255, 255, 0.25);
     background: rgba(255, 255, 255, 0.12);
     color: white;
   }
 
   .hero {
-    padding: 28px 0 22px;
+    padding: 8px 0 8px;
   }
 
   .eyebrow {
-    font-size: 9px;
+    font-size: 10px;
     letter-spacing: 1.1px;
+    margin-bottom: 6px;
   }
 
   .hero h1 {
     max-width: 100%;
-    font-size: clamp(35px, 10vw, 43px);
-    line-height: 1;
-    letter-spacing: -1.6px;
+    font-size: clamp(28px, 7.6vw, 36px);
+    line-height: 1.05;
+    letter-spacing: -1.2px;
   }
 
   .intro {
     max-width: 100%;
-    margin-top: 14px;
+    margin-top: 8px;
     font-size: 15px;
-    line-height: 1.45;
+    line-height: 1.4;
   }
 
   .scan-card {
     width: 100%;
-    border-radius: 17px;
+    border-radius: 16px;
     box-shadow: 0 7px 20px rgba(41, 67, 51, 0.08);
   }
 
   .photo-area {
-    height: 184px;
+    height: 168px;
   }
 
   .photo-placeholder span {
-    font-size: 42px;
+    font-size: 44px;
   }
 
   .photo-placeholder p {
     margin: 8px 0;
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .camera-button {
     bottom: 14px;
-    padding: 10px 16px;
-    font-size: 13px;
+    padding: 12px 18px;
+    font-size: 15px;
   }
 
   .form-body {
-    padding: 20px 12px 20px;
+    padding: 14px 12px 12px;
   }
 
   .field-group {
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
 
   .field-label {
-    margin-bottom: 8px;
-    font-size: 14px;
+    margin-bottom: 6px;
+    font-size: 15px;
   }
 
   select {
-    min-height: 46px;
-    padding: 11px 13px;
-    font-size: 14px;
+    min-height: 50px;
+    padding: 12px 14px;
+    font-size: 16px;
   }
 
   .chips {
-    gap: 7px;
+    gap: 8px;
   }
 
   .chip {
-    min-height: 39px;
-    padding: 9px 12px;
-    font-size: 12px;
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 14px;
   }
 
   .primary {
-    min-height: 49px;
-    padding: 13px 15px;
-    border-radius: 10px;
-    font-size: 14px;
+    min-height: 54px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 16px;
   }
 
   .primary b {
-    font-size: 19px;
+    font-size: 22px;
   }
 
   .plantnet-box {
-    margin-bottom: 20px;
+    margin-bottom: 14px;
+  }
+
+  .plantnet-toggle {
+    padding: 12px 14px;
   }
 
   #plantnetKey {
-    min-height: 45px;
-    padding: 11px;
-    font-size: 14px;
+    min-height: 48px;
+    padding: 12px;
+    font-size: 16px;
   }
 
   #identifySpeciesBtn {
-    min-height: 45px;
-    padding: 11px 12px;
-    font-size: 12px;
+    min-height: 48px;
+    padding: 12px;
+    font-size: 14px;
   }
 
   #speciesStatus {
-    font-size: 12px;
-  }
-
-  .trust {
-    margin: 14px 0 28px;
-    font-size: 10px;
-  }
-
-  .section-title {
-    margin-bottom: 13px;
-  }
-
-  .section-title h2 {
-    font-size: 29px;
-  }
-
-  .section-title > span {
-    font-size: 9px;
-    padding: 5px 7px;
-  }
-
-  .empty-state {
-    padding: 22px 15px;
     font-size: 13px;
   }
 
+  .trust {
+    margin: 10px 0 4px;
+    font-size: 11px;
+  }
+
+  .today {
+    margin-top: 12px;
+  }
+
+  .section-title {
+    margin-bottom: 8px;
+  }
+
+  .section-title h2 {
+    font-size: 26px;
+  }
+
+  .section-title > span {
+    font-size: 10px;
+    padding: 5px 8px;
+  }
+
+  .empty-state {
+    padding: 14px 12px;
+    font-size: 14px;
+  }
+
   .bottom-nav {
-    min-height: 108px;
+    min-height: 64px;
     justify-content: space-around;
-    gap: 0;
-    padding: 14px 8px calc(18px + env(safe-area-inset-bottom));
+    align-items: stretch;
+    gap: 4px;
+    padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px));
     background: rgba(255, 254, 250, 0.97);
     box-shadow: 0 -5px 18px rgba(24, 54, 44, 0.08);
   }
 
   .bottom-nav a,
   .bottom-nav button {
-    min-width: 88px;
-    padding: 10px 14px;
-    border-radius: 16px;
-    font-size: 14px;
-    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    min-height: 52px;
+    padding: 8px 6px;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    gap: 4px;
   }
 
   .bottom-nav span {
-    font-size: 28px;
-    line-height: 27px;
+    font-size: 26px;
+    line-height: 1;
   }
 
   .bottom-nav .active {
@@ -201,7 +214,13 @@
   .modal {
     width: 100%;
     max-height: 90dvh;
-    padding: 25px 18px calc(25px + env(safe-area-inset-bottom));
+    padding: 22px 16px calc(22px + env(safe-area-inset-bottom, 0px));
     border-radius: 20px 20px 0 0;
+  }
+}
+
+@media (max-width: 699px) {
+  .hero h1 {
+    font-size: clamp(30px, 8.8vw, 36px);
   }
 }
