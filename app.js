@@ -78,14 +78,23 @@ $('#photoInput').addEventListener('change', event => {
 });
 
 const keyInput = $('#plantnetKey');
-keyInput.value = localStorage.getItem('plantnetApiKey') || '';
-keyInput.addEventListener('input', () => {
-  localStorage.setItem('plantnetApiKey', keyInput.value.trim());
-  updateIdentifyButton();
-});
 
-function updateIdentifyButton(){
-  $('#identifySpeciesBtn').disabled = !(imageFile && keyInput.value.trim());
+if (keyInput) {
+  keyInput.value = localStorage.getItem('plantnetApiKey') || '';
+  keyInput.addEventListener('input', () => {
+    localStorage.setItem('plantnetApiKey', keyInput.value.trim());
+    updateIdentifyButton();
+  });
+}
+
+function updateIdentifyButton() {
+  const button = $('#identifySpeciesBtn');
+
+  if (!button || !keyInput) {
+    return;
+  }
+
+  button.disabled = !(imageFile && keyInput.value.trim());
 }
 
 function plantNameFromResult(result){
