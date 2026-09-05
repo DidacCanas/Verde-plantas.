@@ -1,4 +1,4 @@
-const CACHE_NAME = 'verde-salud-v9';
+const CACHE_NAME = 'verde-salud-v10';
 
 const APP_FILES = [
   './',
@@ -28,24 +28,28 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(names =>
-      Promise.all(
-        names
-          .filter(name => name !== CACHE_NAME)
-          .map(name => caches.delete(name))
+    caches.keys()
+      .then(names =>
+        Promise.all(
+          names
+            .filter(name => name !== CACHE_NAME)
+            .map(name => caches.delete(name))
+        )
       )
-    ).then(() => self.clients.claim())
+      .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', event => {
   const request = event.request;
 
-  if (request.method !== 'GET') return;
+  if (request.method !== 'GET') {
+    return;
+  }
 
   const url = new URL(request.url);
 
-  // No cachear peticiones externas, como Pl@ntNet
+  // No interceptar peticiones externas como Pl@ntNet
   if (url.origin !== self.location.origin) {
     return;
   }
@@ -70,7 +74,9 @@ self.addEventListener('fetch', event => {
 
   event.respondWith(
     caches.match(request).then(cached => {
-      if (cached) return cached;
+      if (cached) {
+        return cached;
+      }
 
       return fetch(request).then(response => {
         if (!response || response.status !== 200) {
