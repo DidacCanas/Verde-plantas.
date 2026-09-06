@@ -11,19 +11,19 @@
   }
 
   .hero {
-    padding-top: 18px;
-    padding-bottom: 18px;
+    padding-top: 24px;
+    padding-bottom: 24px;
   }
 
   .hero h1 {
-    font-size: clamp(38px, 10.5vw, 50px);
-    line-height: 1.04;
+    font-size: clamp(44px, 12vw, 58px);
+    line-height: 1.06;
   }
 
   .intro {
-    font-size: 18px;
-    line-height: 1.5;
-    margin-top: 14px;
+    font-size: 20px;
+    line-height: 1.55;
+    margin-top: 18px;
   }
 
   .scan-card {
@@ -33,68 +33,68 @@
   }
 
   .photo-area {
-    height: 285px;
+    height: 340px;
   }
 
   .photo-placeholder span {
-    font-size: 68px;
+    font-size: 80px;
   }
 
   .photo-placeholder p {
-    font-size: 18px;
-    line-height: 1.5;
-    margin-top: 16px;
+    font-size: 20px;
+    line-height: 1.55;
+    margin-top: 20px;
   }
 
   .camera-button {
-    bottom: 20px;
-    padding: 16px 28px;
-    font-size: 18px;
+    bottom: 24px;
+    padding: 20px 34px;
+    font-size: 20px;
     border-radius: 99px;
   }
 
   .form-body {
-    padding: 26px 18px 22px;
+    padding: 30px 20px 26px;
   }
 
   .field-group {
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
 
   .field-label {
-    font-size: 18px;
-    margin-bottom: 11px;
+    font-size: 20px;
+    margin-bottom: 13px;
   }
 
   select {
-    min-height: 62px;
-    border-radius: 15px;
-    font-size: 18px;
-    padding: 16px 18px;
+    min-height: 70px;
+    border-radius: 16px;
+    font-size: 20px;
+    padding: 18px 20px;
   }
 
   .chips {
-    gap: 10px;
+    gap: 12px;
   }
 
   .chip {
-    min-height: 54px;
-    padding: 13px 18px;
-    font-size: 17px;
+    min-height: 62px;
+    padding: 15px 20px;
+    font-size: 19px;
   }
 
   .automatic-note {
     color: var(--muted);
-    font-size: 15px;
+    font-size: 17px;
     line-height: 1.5;
-    margin: -2px 0 14px;
+    margin: -2px 0 16px;
   }
 
   .photo-analysis-status {
     color: #527161;
-    font-size: 15px;
+    font-size: 17px;
     line-height: 1.5;
-    margin: 14px 2px 0;
+    margin: 16px 2px 0;
   }
 
   .plantnet-box {
@@ -104,81 +104,81 @@
   }
 
   .plantnet-toggle {
-    min-height: 72px;
-    padding: 16px 18px;
+    min-height: 82px;
+    padding: 18px 20px;
   }
 
   .plantnet-toggle b {
-    font-size: 16px;
-  }
-
-  .plantnet-toggle small {
-    font-size: 14px;
-  }
-
-  .primary {
-    min-height: 68px;
-    border-radius: 15px;
-    padding: 18px 20px;
     font-size: 18px;
   }
 
-  .primary b {
-    font-size: 25px;
-  }
-
-  .trust {
-    margin-top: 16px;
-    font-size: 13px;
-  }
-
-  .today {
-    margin-top: 28px;
-  }
-
-  .section-title h2 {
-    font-size: 34px;
-  }
-
-  .section-title > span {
-    font-size: 12px;
-    padding: 7px 10px;
-  }
-
-  .empty-state {
-    min-height: 76px;
-    display: grid;
-    place-items: center;
-    padding: 18px;
+  .plantnet-toggle small {
     font-size: 16px;
   }
 
+  .primary {
+    min-height: 76px;
+    border-radius: 16px;
+    padding: 20px 22px;
+    font-size: 20px;
+  }
+
+  .primary b {
+    font-size: 28px;
+  }
+
+  .trust {
+    margin-top: 18px;
+    font-size: 15px;
+  }
+
+  .today {
+    margin-top: 34px;
+  }
+
+  .section-title h2 {
+    font-size: 40px;
+  }
+
+  .section-title > span {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .empty-state {
+    min-height: 90px;
+    display: grid;
+    place-items: center;
+    padding: 22px;
+    font-size: 18px;
+  }
+
   .bottom-nav {
-    min-height: 86px;
-    padding: 10px 10px calc(12px + env(safe-area-inset-bottom, 0px));
+    min-height: 100px;
+    padding: 12px 12px calc(14px + env(safe-area-inset-bottom, 0px));
   }
 
   .bottom-nav a,
   .bottom-nav button {
-    min-height: 66px;
-    padding: 10px 8px;
-    border-radius: 16px;
-    font-size: 15px;
-    gap: 6px;
+    min-height: 78px;
+    padding: 12px 10px;
+    border-radius: 18px;
+    font-size: 17px;
+    gap: 8px;
   }
 
   .bottom-nav span {
-    font-size: 32px;
+    font-size: 38px;
   }
 }
 
 @media (max-width: 500px) {
   .photo-area {
-    height: 260px;
+    height: 300px;
   }
 
   .hero h1 {
-    font-size: clamp(36px, 10.5vw, 46px);
+    font-size: clamp(40px, 12vw, 52px);
   }
 
   .chips {

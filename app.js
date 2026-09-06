@@ -89,6 +89,8 @@ $('#photoInput').addEventListener('change', async event => {
   await analyzePhotoLocally();
 
   updateIdentifyButton();
+
+  identifySpeciesAutomatically();
 });
 async function analyzePhotoLocally() {
   if (!imageFile) {
@@ -250,8 +252,9 @@ function setDetectedPlant(name){
   select.value = option.value;
 }
 
-$('#identifySpeciesBtn').addEventListener('click', async () => {
-  if (!imageFile || !keyInput.value.trim()) return;
+async function identifySpeciesAutomatically() {
+  if (!imageFile || !keyInput || !keyInput.value.trim()) return;
+
   const button = $('#identifySpeciesBtn'), status = $('#speciesStatus');
   button.disabled = true;
   button.querySelector('span').textContent = 'Identificando especie…';
@@ -276,7 +279,9 @@ $('#identifySpeciesBtn').addEventListener('click', async () => {
     button.querySelector('span').textContent = 'Identificar especie en la foto';
     updateIdentifyButton();
   }
-});
+}
+
+$('#identifySpeciesBtn').addEventListener('click', identifySpeciesAutomatically);
 
 $('#analyzeBtn').addEventListener('click', () => {
   if (!imageFile) {
