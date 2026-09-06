@@ -1,4 +1,4 @@
-const CACHE_NAME = 'verde-salud-v13';
+const CACHE_NAME = 'verde-salud-v14';
 
 const APP_FILES = [
   './',

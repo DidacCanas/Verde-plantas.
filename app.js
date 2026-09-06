@@ -91,6 +91,7 @@ $('#photoInput').addEventListener('change', async event => {
   updateIdentifyButton();
 
   identifySpeciesAutomatically();
+  identifyDiseaseAutomatically();
 });
 async function analyzePhotoLocally() {
   if (!imageFile) {
@@ -258,7 +259,7 @@ async function identifySpeciesAutomatically() {
   const button = $('#identifySpeciesBtn'), status = $('#speciesStatus');
   button.disabled = true;
   button.querySelector('span').textContent = 'Identificando especie…';
-  status.textContent = 'Enviando la foto a Pl@ntNet para analizarla.';
+  status.textContent = 'Enviando la foto a Pl@ntNet para identificar la especie.';
   try {
     const data = new FormData();
     data.append('images', imageFile, imageFile.name);
@@ -272,12 +273,45 @@ async function identifySpeciesAutomatically() {
     const plant = plantNameFromResult(top);
     const confidence = Math.round((top.score || 0) * 100);
     setDetectedPlant(plant.common ? `${plant.common} (${plant.scientific})` : plant.scientific);
-    status.textContent = `Detectada: ${plant.common ? plant.common + ' · ' : ''}${plant.scientific} · confianza ${confidence}%. Puedes corregirla en la lista si no coincide.`;
+    status.textContent = `Especie detectada: ${plant.common ? plant.common + ' · ' : ''}${plant.scientific} · confianza ${confidence}%. Puedes corregirla en la lista si no coincide.`;
   } catch (error) {
-    status.textContent = `No se pudo identificar: ${error.message}. Comprueba la clave, el dominio autorizado y la conexión.`;
+    status.textContent = `No se pudo identificar la especie: ${error.message}.`;
   } finally {
     button.querySelector('span').textContent = 'Identificar especie en la foto';
     updateIdentifyButton();
+  }
+}
+
+const diseaseBox = $('#diseaseResultBox');
+const diseaseName = $('#diseaseName');
+const diseaseConfidence = $('#diseaseConfidence');
+const diseaseDescription = $('#diseaseDescription');
+
+async function identifyDiseaseAutomatically() {
+  if (!imageFile || !keyInput || !keyInput.value.trim()) {
+    if (diseaseBox) diseaseBox.hidden = true;
+    return;
+  }
+
+  try {
+    const data = new FormData();
+    data.append('images', imageFile, imageFile.name);
+    data.append('organs', 'auto');
+    const url = `https://my-api.plantnet.org/v2/diseases/identify?lang=es&api-key=${encodeURIComponent(keyInput.value.trim())}`;
+    const response = await fetch(url, { method: 'POST', body: data });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'No se pudo analizar la enfermedad');
+    const top = result.results?.[0];
+    if (!top) throw new Error('No se detectó ninguna enfermedad con suficiente coincidencia');
+    const diseaseLabel = top.label || top.name || 'Enfermedad no identificada';
+    const confidence = Math.round((top.score || 0) * 100);
+    const categories = Array.isArray(top.categories) ? top.categories.join(', ') : '';
+    diseaseName.textContent = diseaseLabel;
+    diseaseConfidence.textContent = `Confianza: ${confidence}%${categories ? ' · Categoría: ' + categories : ''}`;
+    diseaseDescription.textContent = 'Esta detección es orientativa y se basa en el análisis visual de la foto. Confirma el diagnóstico con un especialista antes de aplicar cualquier tratamiento.';
+    diseaseBox.hidden = false;
+  } catch (error) {
+    diseaseBox.hidden = true;
   }
 }
 
@@ -384,4 +418,24 @@ plantnetToggle.addEventListener('click', () => {
   const expanded = plantnetToggle.getAttribute('aria-expanded') === 'true';
   plantnetToggle.setAttribute('aria-expanded', String(!expanded));
   plantnetContent.hidden = expanded;
+});
+
+const themeToggle = $('#themeToggle');
+const themeIconLight = document.querySelector('.theme-icon-light');
+const themeIconDark = document.querySelector('.theme-icon-dark');
+
+function applyTheme(dark) {
+  document.body.classList.toggle('dark-theme', dark);
+  themeIconLight.hidden = dark;
+  themeIconDark.hidden = !dark;
+  localStorage.setItem('verdeTheme', dark ? 'dark' : 'light');
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) metaTheme.content = dark ? '#0a1f17' : '#1b4d3c';
+}
+
+const savedTheme = localStorage.getItem('verdeTheme');
+applyTheme(savedTheme === 'dark');
+
+themeToggle.addEventListener('click', () => {
+  applyTheme(!document.body.classList.contains('dark-theme'));
 });

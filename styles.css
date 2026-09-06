@@ -681,6 +681,275 @@ select:focus { outline: none; border-color: var(--leaf-600); }
   to { transform: none; opacity: 1; }
 }
 
+/* Disease result box */
+.disease-result-box {
+  border: 1px solid #e8c4a0;
+  border-radius: var(--r-md);
+  background: #fef6ec;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.disease-result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.disease-icon {
+  font-size: 22px;
+  color: var(--warn);
+}
+
+.disease-result-header b {
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.disease-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 4px;
+}
+
+.disease-confidence {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+
+.disease-description {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6d5938;
+  margin: 0;
+}
+
+/* Dark theme */
+body.dark-theme {
+  --cream: #0a1f17;
+  --paper: #122a20;
+  --ink: #d4e8d8;
+  --muted: #7a9a8a;
+  --line: #2a4a38;
+  --leaf-100: #1a3a2a;
+  --leaf-200: #2a5a3e;
+  --leaf-400: #4a8a6a;
+  --leaf-600: #6fbf8e;
+  --forest-700: #2d6b53;
+  --forest-500: #3a7a62;
+  --forest-900: #0a1f17;
+  --rose: #3a2a18;
+  --rose-dark: #e8a070;
+  --lime: #b8d040;
+}
+
+body.dark-theme {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+body.dark-theme .scan-card {
+  background: var(--paper);
+  border-color: var(--line);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .photo-area {
+  background: linear-gradient(135deg, #1a3a2a, #2a4a38);
+}
+
+body.dark-theme .photo-area:before { border-color: #2a5a3e; opacity: 0.3; }
+body.dark-theme .photo-area:after { border-color: #3a6a4e; opacity: 0.25; }
+
+body.dark-theme .photo-placeholder { color: #5a8a6e; }
+
+body.dark-theme select,
+body.dark-theme #plantnetKey {
+  background: #1a2a20;
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+body.dark-theme .chip {
+  background: #1a2a20;
+  border-color: var(--line);
+  color: #8aaa9a;
+}
+
+body.dark-theme .chip:hover {
+  background: var(--leaf-100);
+  border-color: var(--leaf-400);
+}
+
+body.dark-theme .chip.selected {
+  background: #2a5a3e;
+  border-color: #4a8a6a;
+  color: #c0e8d0;
+}
+
+body.dark-theme .plantnet-box {
+  background: #162a20;
+  border-color: var(--line);
+}
+
+body.dark-theme .plantnet-toggle b { color: var(--ink); }
+body.dark-theme .plantnet-toggle small { color: var(--muted); }
+
+body.dark-theme .primary {
+  background: var(--forest-500);
+}
+
+body.dark-theme .primary:hover {
+  background: var(--leaf-600);
+}
+
+body.dark-theme .bottom-nav {
+  background: rgba(10, 31, 23, 0.97);
+  border-top-color: var(--line);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .bottom-nav a,
+body.dark-theme .bottom-nav button {
+  color: #6a8a7a;
+}
+
+body.dark-theme .bottom-nav a:hover,
+body.dark-theme .bottom-nav button:hover {
+  color: var(--leaf-400);
+}
+
+body.dark-theme .bottom-nav .active {
+  background: #1a3a2a;
+  color: var(--leaf-400);
+}
+
+body.dark-theme .topbar {
+  background: var(--forest-900);
+}
+
+body.dark-theme .brand { color: var(--leaf-400); }
+
+body.dark-theme .icon-btn {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--leaf-400);
+}
+
+body.dark-theme .icon-btn:hover {
+  background: var(--leaf-100);
+  border-color: var(--leaf-400);
+}
+
+body.dark-theme .install-btn {
+  background: #1a3a2a;
+  border-color: #3a6a4e;
+  color: var(--leaf-400);
+}
+
+body.dark-theme .install-btn:hover { background: #2a4a38; }
+
+body.dark-theme .modal {
+  background: var(--paper);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-theme .close {
+  background: #1a2a20;
+  color: var(--muted);
+}
+
+body.dark-theme .close:hover { background: #2a3a30; }
+
+body.dark-theme .result-copy { color: #a0b8a8; }
+body.dark-theme .result-heading p { color: var(--muted); }
+
+body.dark-theme .notice {
+  background: #2a2a18;
+  color: #c0b080;
+}
+
+body.dark-theme .pill {
+  background: #1a3a2a;
+  color: var(--leaf-400);
+}
+
+body.dark-theme .timeline li { border-bottom-color: var(--line); }
+body.dark-theme .day { color: var(--muted); }
+body.dark-theme .step p { color: #8a9a8a; }
+
+body.dark-theme .prevention {
+  background: #1a3a2a;
+}
+
+body.dark-theme .prevention li { color: #a0c0a8; }
+body.dark-theme .prevention li:before { color: var(--leaf-600); }
+
+body.dark-theme .task {
+  background: var(--paper);
+  border-color: var(--line);
+}
+
+body.dark-theme .task:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: var(--leaf-400);
+}
+
+body.dark-theme .task-check {
+  background: #1a2a20;
+  border-color: var(--line);
+}
+
+body.dark-theme .task-copy span { color: var(--muted); }
+body.dark-theme .task-day { color: var(--leaf-400); }
+
+body.dark-theme .empty-state {
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+body.dark-theme .section-title > span {
+  background: #1a2a20;
+  color: var(--muted);
+}
+
+body.dark-theme .history-item {
+  background: #162a20;
+}
+
+body.dark-theme .history-item:hover { background: #1a3a2a; }
+body.dark-theme .history-icon { background: #1a3a2a; color: var(--leaf-400); }
+body.dark-theme .history-item span { color: var(--muted); }
+body.dark-theme .no-history { color: var(--muted); }
+
+body.dark-theme .disease-result-box {
+  background: #2a2a18;
+  border-color: #4a3a20;
+}
+
+body.dark-theme .disease-result-header b { color: var(--ink); }
+body.dark-theme .disease-name { color: var(--rose-dark); }
+body.dark-theme .disease-confidence { color: var(--muted); }
+body.dark-theme .disease-description { color: #b0a070; }
+
+body.dark-theme .diagnosis-icon {
+  background: var(--rose);
+  color: var(--rose-dark);
+}
+
+body.dark-theme .modal-backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+body.dark-theme .eyebrow { color: #5a8a6e; }
+body.dark-theme .hero em { color: var(--leaf-400); }
+body.dark-theme .intro { color: var(--muted); }
+body.dark-theme .trust { color: var(--muted); }
+body.dark-theme .trust span { color: var(--leaf-600); }
+
 /* Desktop */
 @media (min-width: 700px) {
   .shell { padding: 0 20px 112px; }
