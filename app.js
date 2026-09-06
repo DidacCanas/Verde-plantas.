@@ -4,6 +4,7 @@ let installPrompt;
 let imageFile;
 let previewUrl;
 let photoAnalysisResult = null;
+let diseaseCatalogPromise = null;
 
 const db = {
   manchas: {name:'Mancha foliar (posible hongo)', icon:'◌', confidence:'Patrón compatible · confirmar de cerca', copy:'Las manchas suelen aparecer cuando las hojas permanecen húmedas o el aire circula poco. Retira las hojas muy afectadas y observa si las lesiones avanzan.', check:'Comprueba el reverso de las hojas y evita tratar si hay lluvia, mucho calor o viento.', steps:[['Hoy','Sanea y aísla','Retira hojas afectadas con tijeras limpias. No las compostes. Riega solo el sustrato.'],['Día 3','Tratamiento preventivo','Si el problema avanza, consulta un producto fungicida autorizado para tu planta (por ejemplo, cobre o bicarbonato potásico) y sigue estrictamente la etiqueta.'],['Día 10','Revisión y repetición','Revisa los brotes nuevos. Repite solo si la etiqueta del producto y el estado de la planta lo indican.']], prevent:['Riega a primera hora y siempre a nivel del sustrato.','Deja espacio entre plantas para que circule el aire.','Revisa hojas nuevas una vez a la semana y retira las caídas.']},
@@ -302,17 +303,48 @@ async function identifyDiseaseAutomatically() {
     const result = await response.json();
     if (!response.ok) throw new Error(result.message || 'No se pudo analizar la enfermedad');
     const top = result.results?.[0];
-    if (!top) throw new Error('No se detectó ninguna enfermedad con suficiente coincidencia');
-    const diseaseLabel = top.label || top.name || 'Enfermedad no identificada';
+    if (!top) throw new Error('No se detectó ninguna enfermedad o plaga con suficiente coincidencia');
+    const readableName = await getReadableDiseaseName(top, keyInput.value.trim());
     const confidence = Math.round((top.score || 0) * 100);
     const categories = Array.isArray(top.categories) ? top.categories.join(', ') : '';
-    diseaseName.textContent = diseaseLabel;
+    diseaseName.textContent = readableName;
     diseaseConfidence.textContent = `Confianza: ${confidence}%${categories ? ' · Categoría: ' + categories : ''}`;
-    diseaseDescription.textContent = 'Esta detección es orientativa y se basa en el análisis visual de la foto. Confirma el diagnóstico con un especialista antes de aplicar cualquier tratamiento.';
+    diseaseDescription.textContent = 'Posible enfermedad o plaga detectada mediante análisis visual. Confirma el diagnóstico con un especialista antes de aplicar cualquier tratamiento.';
     diseaseBox.hidden = false;
   } catch (error) {
     diseaseBox.hidden = true;
+    console.error('No se pudo identificar la enfermedad o plaga:', error);
   }
+}
+
+function isDiseaseCode(value) {
+  return /^[A-Z0-9]{4,10}$/.test(value);
+}
+
+async function getReadableDiseaseName(result, apiKey) {
+  const directName = result.description || result.label || result.disease?.label;
+  if (directName && !isDiseaseCode(directName)) {
+    return directName;
+  }
+
+  if (!diseaseCatalogPromise) {
+    const url = `https://my-api.plantnet.org/v2/diseases?lang=es&api-key=${encodeURIComponent(apiKey)}`;
+    diseaseCatalogPromise = fetch(url)
+      .then(response => response.ok ? response.json() : [])
+      .catch(() => []);
+  }
+
+  const catalog = await diseaseCatalogPromise;
+  const catalogEntry = Array.isArray(catalog)
+    ? catalog.find(item => item.name === result.name)
+    : null;
+  const catalogName = catalogEntry?.label || catalogEntry?.description;
+
+  if (catalogName && !isDiseaseCode(catalogName)) {
+    return catalogName;
+  }
+
+  return 'Posible enfermedad o plaga no identificada';
 }
 
 $('#identifySpeciesBtn').addEventListener('click', identifySpeciesAutomatically);

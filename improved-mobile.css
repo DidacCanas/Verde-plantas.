@@ -11,19 +11,19 @@
   }
 
   .hero {
-    padding-top: 24px;
-    padding-bottom: 24px;
+    padding-top: 28px;
+    padding-bottom: 28px;
   }
 
   .hero h1 {
-    font-size: clamp(44px, 12vw, 58px);
-    line-height: 1.06;
+    font-size: clamp(48px, 13vw, 64px);
+    line-height: 1.08;
   }
 
   .intro {
-    font-size: 20px;
+    font-size: 22px;
     line-height: 1.55;
-    margin-top: 18px;
+    margin-top: 20px;
   }
 
   .scan-card {
@@ -33,66 +33,66 @@
   }
 
   .photo-area {
-    height: 340px;
+    height: 380px;
   }
 
   .photo-placeholder span {
-    font-size: 80px;
+    font-size: 90px;
   }
 
   .photo-placeholder p {
-    font-size: 20px;
+    font-size: 22px;
     line-height: 1.55;
-    margin-top: 20px;
+    margin-top: 22px;
   }
 
   .camera-button {
-    bottom: 24px;
-    padding: 20px 34px;
-    font-size: 20px;
+    bottom: 28px;
+    padding: 22px 38px;
+    font-size: 22px;
     border-radius: 99px;
   }
 
   .form-body {
-    padding: 30px 20px 26px;
+    padding: 34px 22px 30px;
   }
 
   .field-group {
-    margin-bottom: 28px;
+    margin-bottom: 32px;
   }
 
   .field-label {
-    font-size: 20px;
-    margin-bottom: 13px;
+    font-size: 22px;
+    margin-bottom: 14px;
   }
 
   select {
-    min-height: 70px;
+    min-height: 76px;
     border-radius: 16px;
-    font-size: 20px;
-    padding: 18px 20px;
+    font-size: 22px;
+    padding: 20px 22px;
   }
 
   .chips {
-    gap: 12px;
+    gap: 14px;
   }
 
   .chip {
-    min-height: 62px;
-    padding: 15px 20px;
-    font-size: 19px;
+    min-height: 68px;
+    padding: 17px 22px;
+    font-size: 21px;
   }
 
   .automatic-note {
     color: var(--muted);
-    font-size: 17px;
+    font-size: 18px;
     line-height: 1.5;
-    margin: -2px 0 16px;
+    margin: -2px 0 18px;
   }
 
   .photo-analysis-status {
     color: #527161;
-    font-size: 17px;
+    font-size: 18px;
     line-height: 1.5;
     margin: 16px 2px 0;
   }
@@ -104,81 +104,81 @@
   }
 
   .plantnet-toggle {
-    min-height: 82px;
-    padding: 18px 20px;
+    min-height: 90px;
+    padding: 20px 22px;
   }
 
   .plantnet-toggle b {
-    font-size: 18px;
-  }
-
-  .plantnet-toggle small {
-    font-size: 16px;
-  }
-
-  .primary {
-    min-height: 76px;
-    border-radius: 16px;
-    padding: 20px 22px;
     font-size: 20px;
   }
 
+  .plantnet-toggle small {
+    font-size: 17px;
+  }
+
+  .primary {
+    min-height: 82px;
+    border-radius: 16px;
+    padding: 22px 24px;
+    font-size: 22px;
+  }
+
   .primary b {
-    font-size: 28px;
+    font-size: 30px;
   }
 
   .trust {
-    margin-top: 18px;
-    font-size: 15px;
+    margin-top: 20px;
+    font-size: 16px;
   }
 
   .today {
-    margin-top: 34px;
+    margin-top: 38px;
   }
 
   .section-title h2 {
-    font-size: 40px;
+    font-size: 44px;
   }
 
   .section-title > span {
-    font-size: 14px;
-    padding: 8px 12px;
+    font-size: 15px;
+    padding: 9px 13px;
   }
 
   .empty-state {
-    min-height: 90px;
+    min-height: 100px;
     display: grid;
     place-items: center;
-    padding: 22px;
-    font-size: 18px;
+    padding: 24px;
+    font-size: 19px;
   }
 
   .bottom-nav {
-    min-height: 100px;
-    padding: 12px 12px calc(14px + env(safe-area-inset-bottom, 0px));
+    min-height: 110px;
+    padding: 14px 14px calc(16px + env(safe-area-inset-bottom, 0px));
   }
 
   .bottom-nav a,
   .bottom-nav button {
-    min-height: 78px;
-    padding: 12px 10px;
+    min-height: 84px;
+    padding: 14px 12px;
     border-radius: 18px;
-    font-size: 17px;
+    font-size: 19px;
     gap: 8px;
   }
 
   .bottom-nav span {
-    font-size: 38px;
+    font-size: 42px;
   }
 }
 
 @media (max-width: 500px) {
   .photo-area {
-    height: 300px;
+    height: 320px;
   }
 
   .hero h1 {
-    font-size: clamp(40px, 12vw, 52px);
+    font-size: clamp(42px, 13vw, 54px);
   }
 
   .chips {

@@ -10,7 +10,7 @@
   .shell {
     width: 100%;
     max-width: none;
-    padding: 0 var(--mobile-padding) calc(130px + env(safe-area-inset-bottom, 0px));
+    padding: 0 var(--mobile-padding) calc(140px + env(safe-area-inset-bottom, 0px));
   }
 
   .topbar {
