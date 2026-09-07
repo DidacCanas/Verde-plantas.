@@ -217,10 +217,62 @@
     padding: 22px 16px calc(22px + env(safe-area-inset-bottom, 0px));
     border-radius: 20px 20px 0 0;
   }
+
+  .casa-hero h1 {
+    font-size: clamp(28px, 7.6vw, 36px);
+    line-height: 1.05;
+  }
+
+  .casa-hero .intro {
+    font-size: 15px;
+  }
+
+  .casa-spaces { gap: 14px; }
+
+  .casa-space { padding: 16px; }
+
+  .casa-space-header h3 { font-size: 19px; }
+
+  .casa-space-icon { width: 32px; height: 32px; font-size: 18px; }
+
+  .casa-plant-card {
+    grid-template-columns: 1fr auto auto;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .casa-plant-info b { font-size: 14px; }
+
+  .casa-plant-water { min-width: 60px; }
+  .casa-plant-water-amount { font-size: 14px; }
+
+  .casa-edit-btn, .casa-delete-btn { width: 28px; height: 28px; font-size: 13px; }
+
+  .casa-form input[type="text"],
+  .casa-form input[type="number"] {
+    min-height: 50px;
+    padding: 12px 14px;
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 699px) {
   .hero h1 {
     font-size: clamp(30px, 8.8vw, 36px);
+  }
+
+  .casa-hero h1 {
+    font-size: clamp(30px, 8.8vw, 36px);
+  }
+}
+
+@media (max-width: 420px) {
+  .casa-plant-card {
+    grid-template-columns: 1fr auto;
+  }
+  .casa-plant-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    margin-top: 4px;
   }
 }

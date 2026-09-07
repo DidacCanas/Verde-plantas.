@@ -222,11 +222,44 @@
     </main>
   </div>
 
+  <div id="miCasaView" class="app-view" hidden>
+    <div class="shell">
+      <header class="topbar casa-topbar">
+        <button id="casaBackBtn" class="icon-btn" type="button" aria-label="Volver">←</button>
+        <a class="brand" href="./" aria-label="Mi casa">
+          <span class="brand-mark">✦</span>
+          Mi casa
+        </a>
+        <button id="casaAddBtn" class="icon-btn" type="button" aria-label="Añadir planta">+</button>
+      </header>
+
+      <main>
+        <section class="casa-hero">
+          <p class="eyebrow">TUS ESPACIOS</p>
+          <h1>Plantas de <em>casa</em></h1>
+          <p class="intro">Organiza tus plantas por estancias y consulta cuánta agua necesitan cada semana según la maceta y la época del año.</p>
+        </section>
+
+        <div id="casaSpaces" class="casa-spaces"></div>
+
+        <div id="casaEmpty" class="empty-state casa-empty">
+          Todavía no has añadido ninguna planta.
+          Pulsa el botón + para registrar la primera.
+        </div>
+      </main>
+    </div>
+  </div>
+
   <nav class="bottom-nav" aria-label="Navegación principal">
-    <a href="./" class="active">
+    <a href="./" class="active" id="navInicio">
       <span>⌂</span>
       Inicio
     </a>
+
+    <button id="navCasa" type="button">
+      <span>⌂</span>
+      Mi casa
+    </button>
 
     <button id="openHistory" type="button">
       <span>◷</span>
@@ -278,6 +311,68 @@
       <button class="close" type="button" data-close aria-label="Cerrar">×</button>
       <h2 id="historyTitle">Historial</h2>
       <div id="historyList" class="history-list"></div>
+    </section>
+  </div>
+
+  <div id="casaModal" class="modal-backdrop" hidden>
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="casaModalTitle">
+      <button class="close" type="button" data-close aria-label="Cerrar">×</button>
+      <h2 id="casaModalTitle">Añadir planta</h2>
+
+      <div class="casa-form">
+        <div class="field-group">
+          <label class="field-label" for="casaPlantName">Nombre de la planta</label>
+          <input id="casaPlantName" type="text" placeholder="Ej: Monstera del salón" autocomplete="off">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="casaSpace">Espacio de la casa</label>
+          <div class="select-wrap">
+            <select id="casaSpace">
+              <option value="terraza">Terraza</option>
+              <option value="comedor">Comedor</option>
+              <option value="habitacion">Habitación</option>
+              <option value="cocina">Cocina</option>
+              <option value="bano">Baño</option>
+              <option value="oficina">Oficina</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="casaDiameter">Diámetro de la maceta (cm)</label>
+          <input id="casaDiameter" type="number" min="5" max="100" step="1" placeholder="Ej: 18">
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="casaPlantType">Tipo de planta</label>
+          <div class="select-wrap">
+            <select id="casaPlantType">
+              <option value="tropical">Tropical (monstera, poto, filodendro)</option>
+              <option value="suculenta">Suculenta o crasa</option>
+              <option value="cactus">Cactus</option>
+              <option value="helecho">Helecho</option>
+              <option value="flor">Planta con flor</option>
+              <option value="arbol">Árbol o arbusto</option>
+              <option value="huerto">Huerto (tomate, hierbas)</option>
+              <option value="otra">Otra</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="casaWaterPreview" class="casa-water-preview" hidden>
+          <div class="casa-water-icon">💧</div>
+          <div>
+            <b id="casaWaterAmount"></b>
+            <span id="casaWaterDetail"></span>
+          </div>
+        </div>
+
+        <button id="casaSaveBtn" class="primary" type="button">
+          <span>Guardar planta</span>
+          <b>→</b>
+        </button>
+      </div>
     </section>
   </div>
 

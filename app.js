@@ -471,3 +471,245 @@ applyTheme(savedTheme === 'dark');
 themeToggle.addEventListener('click', () => {
   applyTheme(!document.body.classList.contains('dark-theme'));
 });
+
+/* ──────────────────────────────────────────────────────────
+   Mi casa — registro de plantas por estancias
+   ────────────────────────────────────────────────────────── */
+
+const SPACES = [
+  { value: 'terraza',   label: 'Terraza',   icon: '☀' },
+  { value: 'comedor',   label: 'Comedor',    icon: '◇' },
+  { value: 'habitacion', label: 'Habitación', icon: '☾' },
+  { value: 'cocina',    label: 'Cocina',     icon: '⌂' },
+  { value: 'bano',      label: 'Baño',       icon: '≈' },
+  { value: 'oficina',   label: 'Oficina',    icon: '▢' }
+];
+
+const PLANT_TYPES = {
+  tropical:  { label: 'Tropical',      factor: 1.0  },
+  suculenta: { label: 'Suculenta',     factor: 0.35 },
+  cactus:    { label: 'Cactus',         factor: 0.20 },
+  helecho:   { label: 'Helecho',       factor: 1.3  },
+  flor:      { label: 'Planta con flor', factor: 0.9 },
+  arbol:     { label: 'Árbol/arbusto', factor: 1.2  },
+  huerto:    { label: 'Huerto',        factor: 1.1  },
+  otra:      { label: 'Otra',          factor: 0.8  }
+};
+
+function getSeason() {
+  const month = new Date().getMonth() + 1;
+  if (month >= 3 && month <= 5) return 'primavera';
+  if (month >= 6 && month <= 8) return 'verano';
+  if (month >= 9 && month <= 11) return 'otonio';
+  return 'invierno';
+}
+
+const SEASON_FACTORS = {
+  primavera: 0.80,
+  verano:    1.35,
+  otonio:    0.65,
+  invierno:  0.40
+};
+
+const SEASON_LABELS = {
+  primavera: 'primavera',
+  verano:    'verano',
+  otonio:    'otoño',
+  invierno:  'invierno'
+};
+
+function calculateWeeklyWater(diameterCm, plantType) {
+  if (!diameterCm || diameterCm < 1) return 0;
+  const radius = diameterCm / 2;
+  const baseArea = Math.PI * radius * radius;
+  const baseMl = baseArea * 0.6;
+  const typeFactor = (PLANT_TYPES[plantType] || PLANT_TYPES.otra).factor;
+  const seasonFactor = SEASON_FACTORS[getSeason()] || 1;
+  const totalMl = baseMl * typeFactor * seasonFactor;
+  return Math.round(totalMl / 10) * 10;
+}
+
+function formatWater(ml) {
+  if (ml >= 1000) return `${(ml / 1000).toFixed(1)} L`;
+  return `${ml} ml`;
+}
+
+function getCasaPlants() {
+  return JSON.parse(localStorage.getItem('verdeCasaPlants') || '[]');
+}
+
+function setCasaPlants(v) {
+  localStorage.setItem('verdeCasaPlants', JSON.stringify(v));
+}
+
+const miCasaView = $('#miCasaView');
+const navCasa = $('#navCasa');
+const navInicio = $('#navInicio');
+const casaSpacesContainer = $('#casaSpaces');
+const casaEmpty = $('#casaEmpty');
+const casaModal = $('#casaModal');
+const casaAddBtn = $('#casaAddBtn');
+const casaBackBtn = $('#casaBackBtn');
+const casaSaveBtn = $('#casaSaveBtn');
+const casaPlantName = $('#casaPlantName');
+const casaSpaceSelect = $('#casaSpace');
+const casaDiameterInput = $('#casaDiameter');
+const casaPlantTypeSelect = $('#casaPlantType');
+const casaWaterPreview = $('#casaWaterPreview');
+const casaWaterAmount = $('#casaWaterAmount');
+const casaWaterDetail = $('#casaWaterDetail');
+
+let casaEditingId = null;
+
+function showView(view) {
+  const mainShell = document.querySelector('.shell:not(#miCasaView .shell)');
+  const mainShellEl = document.querySelector('body > .shell');
+  if (view === 'casa') {
+    if (mainShellEl) mainShellEl.style.display = 'none';
+    miCasaView.hidden = false;
+    navInicio.classList.remove('active');
+    navCasa.classList.add('active');
+    renderCasa();
+    miCasaView.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    miCasaView.hidden = true;
+    if (mainShellEl) mainShellEl.style.display = '';
+    navCasa.classList.remove('active');
+    navInicio.classList.add('active');
+  }
+}
+
+navCasa.addEventListener('click', () => showView('casa'));
+casaBackBtn.addEventListener('click', () => showView('inicio'));
+
+function updateCasaWaterPreview() {
+  const diameter = parseFloat(casaDiameterInput.value);
+  const plantType = casaPlantTypeSelect.value;
+  if (diameter && diameter >= 5) {
+    const ml = calculateWeeklyWater(diameter, plantType);
+    casaWaterAmount.textContent = formatWater(ml) + ' / semana';
+    casaWaterDetail.textContent = `Estimación para ${SEASON_LABELS[getSeason()]} en España · ${PLANT_TYPES[plantType].label.toLowerCase()}`;
+    casaWaterPreview.hidden = false;
+  } else {
+    casaWaterPreview.hidden = true;
+  }
+}
+
+casaDiameterInput.addEventListener('input', updateCasaWaterPreview);
+casaPlantTypeSelect.addEventListener('change', updateCasaWaterPreview);
+
+casaAddBtn.addEventListener('click', () => {
+  casaEditingId = null;
+  $('#casaModalTitle').textContent = 'Añadir planta';
+  casaPlantName.value = '';
+  casaSpaceSelect.value = 'terraza';
+  casaDiameterInput.value = '';
+  casaPlantTypeSelect.value = 'tropical';
+  casaWaterPreview.hidden = true;
+  open('casaModal');
+});
+
+casaSaveBtn.addEventListener('click', () => {
+  const name = casaPlantName.value.trim();
+  const space = casaSpaceSelect.value;
+  const diameter = parseFloat(casaDiameterInput.value);
+  const plantType = casaPlantTypeSelect.value;
+
+  if (!name) {
+    casaPlantName.focus();
+    casaPlantName.placeholder = 'Ponle un nombre a tu planta';
+    return;
+  }
+  if (!diameter || diameter < 5) {
+    casaDiameterInput.focus();
+    return;
+  }
+
+  const weeklyMl = calculateWeeklyWater(diameter, plantType);
+  const plants = getCasaPlants();
+
+  if (casaEditingId) {
+    const idx = plants.findIndex(p => p.id === casaEditingId);
+    if (idx >= 0) {
+      plants[idx] = { ...plants[idx], name, space, diameter, plantType, weeklyMl };
+    }
+  } else {
+    plants.push({
+      id: Date.now(),
+      name,
+      space,
+      diameter,
+      plantType,
+      weeklyMl,
+      added: new Date().toLocaleDateString('es-ES')
+    });
+  }
+
+  setCasaPlants(plants);
+  close();
+  renderCasa();
+});
+
+function renderCasa() {
+  const plants = getCasaPlants();
+  const usedSpaces = [...new Set(plants.map(p => p.space))];
+  const allSpaces = SPACES.filter(s => usedSpaces.includes(s.value));
+
+  casaEmpty.hidden = plants.length > 0;
+  casaSpacesContainer.innerHTML = allSpaces.map(space => {
+    const spacePlants = plants.filter(p => p.space === space.value);
+    const totalMl = spacePlants.reduce((sum, p) => sum + (p.weeklyMl || 0), 0);
+    return `
+      <div class="casa-space">
+        <div class="casa-space-header">
+          <span class="casa-space-icon">${space.icon}</span>
+          <h3>${space.label}</h3>
+          <span class="casa-space-count">${spacePlants.length} ${spacePlants.length === 1 ? 'planta' : 'plantas'}</span>
+        </div>
+        <div class="casa-space-total">💧 ${formatWater(totalMl)} / semana en total</div>
+        <div class="casa-plant-grid">
+          ${spacePlants.map(p => `
+            <article class="casa-plant-card" data-id="${p.id}">
+              <div class="casa-plant-info">
+                <b>${p.name}</b>
+                <span class="casa-plant-type">${PLANT_TYPES[p.plantType]?.label || 'Planta'}</span>
+                <span class="casa-plant-meta">Maceta ⌀ ${p.diameter} cm</span>
+              </div>
+              <div class="casa-plant-water">
+                <span class="casa-plant-water-amount">${formatWater(p.weeklyMl)}</span>
+                <span class="casa-plant-water-label">por semana</span>
+              </div>
+              <div class="casa-plant-actions">
+                <button class="casa-edit-btn" data-id="${p.id}" aria-label="Editar planta">✎</button>
+                <button class="casa-delete-btn" data-id="${p.id}" aria-label="Eliminar planta">✕</button>
+              </div>
+            </article>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.querySelectorAll('.casa-edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const plant = getCasaPlants().find(p => p.id == btn.dataset.id);
+      if (!plant) return;
+      casaEditingId = plant.id;
+      $('#casaModalTitle').textContent = 'Editar planta';
+      casaPlantName.value = plant.name;
+      casaSpaceSelect.value = plant.space;
+      casaDiameterInput.value = plant.diameter;
+      casaPlantTypeSelect.value = plant.plantType;
+      updateCasaWaterPreview();
+      open('casaModal');
+    });
+  });
+
+  document.querySelectorAll('.casa-delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const plants = getCasaPlants().filter(p => p.id != btn.dataset.id);
+      setCasaPlants(plants);
+      renderCasa();
+    });
+  });
+}
