@@ -1,4 +1,4 @@
-const CACHE_NAME = 'verde-salud-v19';
+const CACHE_NAME = 'verde-salud-v20';
 
 const APP_FILES = [
   './',
@@ -8,6 +8,7 @@ const APP_FILES = [
   './improved-mobile.css',
   './app.js',
   './manifest.webmanifest',
+  './icon.svg',
   './app-icon.svg'
 ];
 
