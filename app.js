@@ -543,6 +543,7 @@ function setCasaPlants(v) {
 }
 
 const miCasaView = $('#miCasaView');
+const mainShell = $('#mainShell');
 const navCasa = $('#navCasa');
 const navInicio = $('#navInicio');
 const casaSpacesContainer = $('#casaSpaces');
@@ -562,18 +563,16 @@ const casaWaterDetail = $('#casaWaterDetail');
 let casaEditingId = null;
 
 function showView(view) {
-  const mainShell = document.querySelector('.shell:not(#miCasaView .shell)');
-  const mainShellEl = document.querySelector('body > .shell');
   if (view === 'casa') {
-    if (mainShellEl) mainShellEl.style.display = 'none';
+    if (mainShell) mainShell.style.display = 'none';
     miCasaView.hidden = false;
     navInicio.classList.remove('active');
     navCasa.classList.add('active');
     renderCasa();
-    miCasaView.scrollIntoView({ behavior: 'smooth' });
+    window.scrollTo(0, 0);
   } else {
     miCasaView.hidden = true;
-    if (mainShellEl) mainShellEl.style.display = '';
+    if (mainShell) mainShell.style.display = '';
     navCasa.classList.remove('active');
     navInicio.classList.add('active');
   }
@@ -581,6 +580,24 @@ function showView(view) {
 
 navCasa.addEventListener('click', () => showView('casa'));
 casaBackBtn.addEventListener('click', () => showView('inicio'));
+
+$('#saveToCasaBtn').addEventListener('click', () => {
+  const plantSelect = $('#plant');
+  const detectedName = plantSelect.options[plantSelect.selectedIndex].text;
+  const cleanName = detectedName === 'Selecciona una planta' ? '' : detectedName;
+
+  closeAllModals();
+
+  casaEditingId = null;
+  $('#casaModalTitle').textContent = 'Guardar en Mi casa';
+  casaPlantName.value = cleanName;
+  casaSpaceSelect.value = 'terraza';
+  casaDiameterInput.value = '';
+  casaPlantTypeSelect.value = 'tropical';
+  casaWaterPreview.hidden = true;
+  casaModal.hidden = false;
+  document.body.style.overflow = 'hidden';
+});
 
 function updateCasaWaterPreview() {
   const diameter = parseFloat(casaDiameterInput.value);
