@@ -32,8 +32,9 @@
   }
 
   .icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
     border-color: rgba(255, 255, 255, 0.25);
     background: rgba(255, 255, 255, 0.12);
     color: white;
@@ -219,34 +220,40 @@
   }
 
   .casa-hero h1 {
-    font-size: clamp(28px, 7.6vw, 36px);
+    font-size: clamp(32px, 9vw, 42px);
     line-height: 1.05;
   }
 
   .casa-hero .intro {
-    font-size: 15px;
+    font-size: 17px;
+    line-height: 1.45;
   }
 
-  .casa-spaces { gap: 14px; }
+  .casa-spaces { gap: 16px; }
 
-  .casa-space { padding: 16px; }
+  .casa-space { padding: 20px; }
 
-  .casa-space-header h3 { font-size: 19px; }
+  .casa-space-header h3 { font-size: 22px; }
 
-  .casa-space-icon { width: 32px; height: 32px; font-size: 18px; }
+  .casa-space-icon { width: 40px; height: 40px; font-size: 22px; }
+
+  .casa-space-total { font-size: 15px; }
 
   .casa-plant-card {
     grid-template-columns: 1fr auto auto;
-    padding: 12px 14px;
-    gap: 10px;
+    padding: 16px 16px;
+    gap: 12px;
   }
 
-  .casa-plant-info b { font-size: 14px; }
+  .casa-plant-info b { font-size: 16px; }
+  .casa-plant-type { font-size: 13px; }
+  .casa-plant-meta { font-size: 13px; }
 
-  .casa-plant-water { min-width: 60px; }
-  .casa-plant-water-amount { font-size: 14px; }
+  .casa-plant-water { min-width: 68px; }
+  .casa-plant-water-amount { font-size: 16px; }
+  .casa-plant-water-label { font-size: 11px; }
 
-  .casa-edit-btn, .casa-delete-btn { width: 28px; height: 28px; font-size: 13px; }
+  .casa-edit-btn, .casa-delete-btn { width: 36px; height: 36px; font-size: 17px; }
 
   .casa-form input[type="text"],
   .casa-form input[type="number"] {
@@ -262,7 +269,7 @@
   }
 
   .casa-hero h1 {
-    font-size: clamp(30px, 8.8vw, 36px);
+    font-size: clamp(34px, 10vw, 42px);
   }
 }
 

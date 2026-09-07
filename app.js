@@ -93,6 +93,7 @@ $('#photoInput').addEventListener('change', async event => {
 
   identifySpeciesAutomatically();
   identifyDiseaseAutomatically();
+  analyzeWithGemini();
 });
 async function analyzePhotoLocally() {
   if (!imageFile) {
@@ -216,12 +217,23 @@ async function analyzePhotoLocally() {
 }
 
 const keyInput = $('#plantnetKey');
+const geminiKeyInput = $('#geminiKey');
+const aiResultBox = $('#aiResultBox');
+const aiResultText = $('#aiResultText');
+const geminiStatus = $('#geminiStatus');
 
 if (keyInput) {
   keyInput.value = localStorage.getItem('plantnetApiKey') || '';
   keyInput.addEventListener('input', () => {
     localStorage.setItem('plantnetApiKey', keyInput.value.trim());
     updateIdentifyButton();
+  });
+}
+
+if (geminiKeyInput) {
+  geminiKeyInput.value = localStorage.getItem('geminiApiKey') || '';
+  geminiKeyInput.addEventListener('input', () => {
+    localStorage.setItem('geminiApiKey', geminiKeyInput.value.trim());
   });
 }
 
@@ -233,6 +245,84 @@ function updateIdentifyButton() {
   }
 
   button.disabled = !(imageFile && keyInput.value.trim());
+}
+
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function analyzeWithGemini() {
+  if (!imageFile || !geminiKeyInput || !geminiKeyInput.value.trim()) {
+    if (aiResultBox) aiResultBox.hidden = true;
+    return;
+  }
+
+  if (geminiStatus) geminiStatus.textContent = 'Analizando síntomas con IA…';
+
+  try {
+    const base64 = await fileToBase64(imageFile);
+    const base64Data = base64.split(',')[1];
+    const mimeType = imageFile.type || 'image/jpeg';
+
+    const prompt = 'Eres un experto en salud de plantas. Analiza esta foto de planta y responde en español, de forma breve (máximo 3 frases): 1) ¿Qué síntomas o problemas ves? (manchas, polvo blanco, amarilleo, insectos, etc.) 2) ¿Cuál es el problema más probable? 3) ¿Qué acción inmediata recomiendas? Responde solo en español.';
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(geminiKeyInput.value.trim())}`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inline_data: { mime_type: mimeType, data: base64Data } }
+          ]
+        }]
+      })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error?.message || 'Error en la API de Gemini');
+    }
+
+    const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!aiText) {
+      throw new Error('La IA no devolvió un análisis válido');
+    }
+
+    if (aiResultText) aiResultText.textContent = aiText;
+    if (aiResultBox) aiResultBox.hidden = false;
+    if (geminiStatus) geminiStatus.textContent = 'Análisis completado.';
+
+    const lowerText = aiText.toLowerCase();
+    if (lowerText.includes('polvo') || lowerText.includes('oídio') || lowerText.includes('oidio') || lowerText.includes('blanc')) {
+      symptom = 'polvo';
+    } else if (lowerText.includes('amarill') || lowerText.includes('clorosis') || lowerText.includes('nutri')) {
+      symptom = 'amarilleo';
+    } else if (lowerText.includes('insect') || lowerText.includes('pulg') || lowerText.includes('cochin') || lowerText.includes('plaga')) {
+      symptom = 'insectos';
+    } else {
+      symptom = 'manchas';
+    }
+
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.classList.toggle('selected', chip.dataset.value === symptom);
+    });
+
+    if (photoAnalysisResult) photoAnalysisResult = symptom;
+  } catch (error) {
+    if (aiResultBox) aiResultBox.hidden = true;
+    if (geminiStatus) geminiStatus.textContent = `No se pudo analizar con IA: ${error.message}`;
+    console.error('Error en análisis con Gemini:', error);
+  }
 }
 
 function plantNameFromResult(result){
@@ -452,6 +542,17 @@ plantnetToggle.addEventListener('click', () => {
   plantnetContent.hidden = expanded;
 });
 
+const geminiToggle = $('#geminiToggle');
+const geminiContent = $('#geminiContent');
+
+if (geminiToggle) {
+  geminiToggle.addEventListener('click', () => {
+    const expanded = geminiToggle.getAttribute('aria-expanded') === 'true';
+    geminiToggle.setAttribute('aria-expanded', String(!expanded));
+    geminiContent.hidden = expanded;
+  });
+}
+
 const themeToggle = $('#themeToggle');
 const themeIconLight = document.querySelector('.theme-icon-light');
 const themeIconDark = document.querySelector('.theme-icon-dark');
@@ -580,6 +681,11 @@ function showView(view) {
 
 navCasa.addEventListener('click', () => showView('casa'));
 casaBackBtn.addEventListener('click', () => showView('inicio'));
+
+const casaBtn = $('#casaBtn');
+if (casaBtn) {
+  casaBtn.addEventListener('click', () => showView('casa'));
+}
 
 $('#saveToCasaBtn').addEventListener('click', () => {
   const plantSelect = $('#plant');

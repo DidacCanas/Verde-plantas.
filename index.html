@@ -49,6 +49,10 @@
           ◷
           <span id="historyDot" class="dot"></span>
         </button>
+
+        <button id="casaBtn" class="icon-btn" type="button" aria-label="Mi casa">
+          ⌂
+        </button>
       </div>
     </header>
 
@@ -80,12 +84,10 @@
             📷 Hacer foto
           </label>
 
-          <!-- capture="environment" abre la cámara trasera del móvil -->
           <input
             id="photoInput"
             type="file"
             accept="image/*"
-            capture="environment"
           >
         </div>
 
@@ -151,6 +153,14 @@
             <p id="diseaseDescription" class="disease-description"></p>
           </div>
 
+          <div id="aiResultBox" class="ai-result-box" hidden>
+            <div class="ai-result-header">
+              <span class="ai-icon">✦</span>
+              <b>Análisis con IA</b>
+            </div>
+            <p id="aiResultText" class="ai-result-text"></p>
+          </div>
+
           <div class="plantnet-box">
             <button
               id="plantnetToggle"
@@ -191,6 +201,39 @@
               </button>
 
               <span id="speciesStatus"></span>
+            </div>
+          </div>
+
+          <div class="plantnet-box gemini-box">
+            <button
+              id="geminiToggle"
+              class="plantnet-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-controls="geminiContent"
+            >
+              <span>
+                <b>Análisis de síntomas con IA (Gemini)</b>
+                <small>Opcional · usa Google Gemini</small>
+              </span>
+
+              <span class="toggle-icon">⌄</span>
+            </button>
+
+            <div id="geminiContent" class="plantnet-content" hidden>
+              <p>
+                Introduce tu clave de Gemini para analizar los síntomas
+                de la planta con inteligencia artificial al hacer la foto.
+              </p>
+
+              <input
+                id="geminiKey"
+                type="password"
+                autocomplete="off"
+                placeholder="Clave API de Gemini"
+              >
+
+              <span id="geminiStatus"></span>
             </div>
           </div>
 
