@@ -1,40 +1,233 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#1b4d3c">
+<!DOCTYPE html>
 
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./icon.svg" type="image/svg+xml">
-
-  <title>Verde Salud</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap"
-    rel="stylesheet"
-  >
-
-  <link rel="stylesheet" href="./styles.css">
-  <link rel="stylesheet" href="./mobile.css">
-  <link rel="stylesheet" href="./improved-mobile.css">
-  <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
-</head>
-
-<body>
-  <div id="mainShell" class="shell">
-
-    <header class="topbar">
-      <a class="brand" href="./" aria-label="Verde Salud">
-        <span class="brand-mark">✦</span>
-        Verde
-      </a>
-
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"error-container":"#ffdad6","surface-tint":"#456553","on-secondary-container":"#386f53","on-error":"#ffffff","primary-fixed-dim":"#abcfb8","tertiary":"#002517","surface-container-lowest":"#ffffff","surface-bright":"#f8faf6","surface-container-highest":"#e1e3df","tertiary-container":"#003d28","tertiary-fixed":"#6ffbbe","on-primary-container":"#83a590","primary-container":"#1b3b2b","on-primary-fixed-variant":"#2d4d3c","inverse-primary":"#abcfb8","surface":"#f8faf6","primary-fixed":"#c7ebd4","on-error-container":"#93000a","on-tertiary-fixed-variant":"#005236","on-primary-fixed":"#002113","on-primary":"#ffffff","background":"#f8faf6","surface-variant":"#e1e3df","primary":"#032517","inverse-surface":"#2e312f","surface-container":"#eceeeb","on-surface":"#191c1a","on-secondary-fixed":"#002112","tertiary-fixed-dim":"#4edea3","secondary-container":"#b5f0cc","outline-variant":"#c1c8c2","on-surface-variant":"#424843","secondary-fixed-dim":"#99d3b1","secondary-fixed":"#b5f0cc","on-tertiary-fixed":"#002113","on-secondary":"#ffffff","error":"#ba1a1a","surface-dim":"#d8dbd7","on-secondary-fixed-variant":"#175036","secondary":"#32694d","surface-container-low":"#f2f4f0","surface-container-high":"#e7e9e5","inverse-on-surface":"#eff1ed","on-background":"#191c1a","outline":"#727973","on-tertiary-container":"#00b37c","on-tertiary":"#ffffff"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-xl":"2rem","card-padding-sm":"1rem","gutter-screen":"1.25rem","card-padding-lg":"1.5rem","space-xxs":"0.25rem","space-sm":"0.75rem","space-3xl":"3.5rem","space-lg":"1.5rem","space-md":"1rem","space-2xl":"2.5rem","space-xs":"0.5rem"},fontFamily:{"headline-lg":["Playfair Display"],"title-md":["Plus Jakarta Sans"],"headline-md":["Playfair Display"],"label-sm":["Plus Jakarta Sans"],"body-md":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],"display":["Playfair Display"],"headline-lg-mobile":["Playfair Display"],"label-caps":["Plus Jakarta Sans"],"headline-sm":["Playfair Display"],"body-sm":["Plus Jakarta Sans"]},fontSize:{"headline-lg":["34px",{lineHeight:"42px",letterSpacing:"-0.015em",fontWeight:"600"}],"title-md":["16px",{lineHeight:"24px",letterSpacing:"-0.005em",fontWeight:"700"}],"headline-md":["24px",{lineHeight:"32px",fontWeight:"600"}],"label-sm":["11px",{lineHeight:"14px",fontWeight:"500"}],"body-md":["14px",{lineHeight:"22px",fontWeight:"400"}],"body-lg":["16px",{lineHeight:"26px",fontWeight:"400"}],"label-md":["13px",{lineHeight:"18px",fontWeight:"600"}],"display":["44px",{lineHeight:"52px",letterSpacing:"-0.02em",fontWeight:"700"}],"headline-lg-mobile":["28px",{lineHeight:"36px",letterSpacing:"-0.01em",fontWeight:"600"}],"label-caps":["11px",{lineHeight:"16px",letterSpacing:"0.08em",fontWeight:"700"}],"headline-sm":["20px",{lineHeight:"28px",fontWeight:"600"}],"body-sm":["12px",{lineHeight:"18px",fontWeight:"400"}]}}}};</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-16 px-gutter-screen flex items-center justify-between"><div class="flex items-center gap-space-xs"><span class="text-secondary select-none font-headline-sm text-headline-sm">✦</span><span class="font-headline-sm text-headline-sm text-primary tracking-tight">Verde</span></div><div class="flex items-center gap-space-xs"><button aria-label="Cambiar modo de luz" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-low transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">light_mode</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- Dynamic Diagnostic & Care Sanctuary View -->
+<div class="px-gutter-screen space-y-space-lg max-w-lg mx-auto w-full pb-8">
+<!-- Title & Narrative Header -->
+<section class="space-y-space-xs pt-2">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-container/70 text-on-secondary-container">
+<span class="text-xs">✦</span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider">Cuidado de Plantas</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight leading-snug">
+        Entiende qué le pasa a tu <span class="italic font-normal text-secondary underline decoration-secondary/30 underline-offset-4">planta</span>.
+      </h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Haz una foto y recibe una orientación sencilla sobre el estado de salud de tu planta en segundos.
+      </p>
+</section>
+<!-- Botanical Viewfinder / Camera Module -->
+<section class="relative rounded-3xl overflow-hidden shadow-lg bg-surface-container-high transition-all" id="camera-module">
+<div class="relative w-full aspect-[4/3] bg-primary flex flex-col justify-between p-4 overflow-hidden">
+<!-- Botanical Scan Reticle Guides -->
+<div class="absolute inset-0 pointer-events-none p-5 flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div class="w-8 h-8 rounded-tl-xl shadow-[inset_3px_3px_0px_#6ffbbe]/70"></div>
+<div class="flex items-center gap-1.5 bg-primary-container/80 backdrop-blur-md px-2.5 py-1 rounded-full text-tertiary-fixed shadow-sm">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed animate-pulse"></span>
+<span class="font-label-sm text-label-sm tracking-wide">Visor activo</span>
+</div>
+<div class="w-8 h-8 rounded-tr-xl shadow-[inset_-3px_3px_0px_#6ffbbe]/70"></div>
+</div>
+<!-- Organic Center Crosshair Overlay -->
+<div class="self-center flex flex-col items-center justify-center text-center px-4 py-2 bg-primary/40 backdrop-blur-xs rounded-2xl">
+<span class="material-symbols-outlined text-tertiary-fixed/80 text-[32px] mb-1">center_focus_strong</span>
+<p class="text-surface-bright font-label-sm text-label-sm drop-shadow-sm max-w-[220px]">
+              Enfoca con luz natural las hojas y el tallo afectado
+            </p>
+</div>
+<div class="flex justify-between items-end">
+<div class="w-8 h-8 rounded-bl-xl shadow-[inset_3px_-3px_0px_#6ffbbe]/70"></div>
+<div class="w-8 h-8 rounded-br-xl shadow-[inset_-3px_-3px_0px_#6ffbbe]/70"></div>
+</div>
+</div>
+<!-- Ambient Leaf Texture Backdrop Placeholder -->
+<div class="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay" data-alt="Close up cinematic shot of a lush Monstera Deliciosa leaf with delicate water drops in soft diffuse sunbeam lighting, botanical garden aesthetic with deep green tones and warm golden morning shadows" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBU3DXOYUW1as29rJL4U3oJPl7UoODGotPEaMSU6qrbuKtV_2wx3dU3e3gGZK4mBX3LVLJkP1GsWZeUUPLGBRqZufHF8rbhDHLpPPfJYMKjiszViaeMQdGd0RA3E3Lp734jK_R_gGj5J7GrTF7WxUXTTJvalBuY-opXvCwT5tDi5qq7BuPzc56nSCVd76pRn4LxD1kfjOsCuYfOPLYDxu9QsU_PmsfqwGyuNsufoJzbrhlmqR2z4qtomw')">
+</div>
+<!-- Floating Camera Action Controls -->
+<div class="relative z-10 w-full mt-auto pt-2 flex items-center justify-center gap-3">
+<button class="flex items-center justify-center gap-2 bg-gradient-to-r from-primary-container to-secondary text-on-primary px-6 py-3 rounded-full font-title-md text-title-md shadow-md hover:brightness-110 active:scale-95 transition-all" id="btn-capture" type="button">
+<span class="material-symbols-outlined text-[20px]">photo_camera</span>
+<span>Capturar</span>
+</button>
+<button aria-label="Abrir carrete de fotos" class="flex items-center justify-center w-12 h-12 rounded-full bg-surface-container-lowest/90 text-primary shadow-sm hover:bg-surface-container-lowest active:scale-95 transition-all" id="btn-gallery" type="button">
+<span class="material-symbols-outlined text-[20px]">photo_library</span>
+</button>
+</div>
+</div>
+<!-- State ribbon below viewfinder -->
+<div class="px-4 py-2.5 bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">Esperando fotografía</span>
+</div>
+<button class="text-secondary font-label-sm text-label-sm font-semibold hover:underline" type="button">Consejos de enfoque</button>
+</div>
+</section>
+<!-- Species Selection Section -->
+<section class="bg-surface-container-low p-card-padding-lg rounded-3xl space-y-space-sm shadow-sm">
+<div class="flex items-center justify-between">
+<label class="font-title-md text-title-md text-primary flex items-center gap-1.5" for="species-select">
+<span class="material-symbols-outlined text-secondary text-[20px]">psychiatry</span>
+          ¿Qué planta es?
+        </label>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">Manual o Auto</span>
+</div>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-lowest text-on-surface font-body-md text-body-md px-4 py-3.5 pr-10 rounded-2xl focus:outline-none focus:ring-0 shadow-sm cursor-pointer transition-all" id="species-select">
+<option disabled="" selected="" value="">Selecciona o busca tu planta</option>
+<option value="monstera">🌿 Monstera Deliciosa (Costilla de Adán)</option>
+<option value="poto">🍃 Poto (Epipremnum aureum)</option>
+<option value="ficus">🌳 Ficus Elastica / Benjamina</option>
+<option value="sansevieria">🪴 Sansevieria (Lengua de suegra)</option>
+<option value="rosal">🌹 Rosal</option>
+<option value="tomatera">🍅 Tomatera (Solanum lycopersicum)</option>
+<option value="otra">🌱 Otra especie silvestre o de interior</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3.5 text-secondary">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</div>
+</div>
+<!-- Quick Species Badges Pills -->
+<div class="flex items-center gap-1.5 overflow-x-auto pb-1 pt-0.5 no-scrollbar">
+<button class="species-quick-pill shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container hover:text-on-secondary-container transition-all" type="button">Monstera</button>
+<button class="species-quick-pill shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container hover:text-on-secondary-container transition-all" type="button">Poto</button>
+<button class="species-quick-pill shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container hover:text-on-secondary-container transition-all" type="button">Ficus</button>
+<button class="species-quick-pill shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container hover:text-on-secondary-container transition-all" type="button">Sansevieria</button>
+<button class="species-quick-pill shrink-0 px-3 py-1.5 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md hover:bg-secondary-container hover:text-on-secondary-container transition-all" type="button">Tomatera</button>
+</div>
+</section>
+<!-- Observed Symptoms Section -->
+<section class="bg-surface-container-low p-card-padding-lg rounded-3xl space-y-space-md shadow-sm">
+<div class="space-y-1">
+<h2 class="font-title-md text-title-md text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">vital_signs</span>
+          Síntomas observados
+        </h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+          Los síntomas se intentarán detectar automáticamente con la fotografía. Puedes ajustarlos o marcarlos manualmente:
+        </p>
+</div>
+<!-- Main Symptom Chips Grid -->
+<div class="grid grid-cols-2 gap-2.5" id="symptom-chips">
+<!-- Manchas -->
+<button class="symptom-btn flex items-center justify-between px-3.5 py-3 rounded-2xl bg-surface-container-lowest text-on-surface font-label-md text-label-md shadow-sm transition-all hover:bg-surface-container" data-symptom="manchas" type="button">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline">lens_blur</span>
+<span>Manchas</span>
+</span>
+<span class="check-icon hidden material-symbols-outlined text-primary text-[18px]">check_circle</span>
+</button>
+<!-- Polvo blanco -->
+<button class="symptom-btn flex items-center justify-between px-3.5 py-3 rounded-2xl bg-surface-container-lowest text-on-surface font-label-md text-label-md shadow-sm transition-all hover:bg-surface-container" data-symptom="polvo" type="button">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-outline">grain</span>
+<span>Polvo blanco</span>
+</span>
+<span class="check-icon hidden material-symbols-outlined text-primary text-[18px]">check_circle</span>
+</button>
+<!-- Hojas amarillas (Activo por defecto) -->
+<button class="symptom-btn active-chip flex items-center justify-between px-3.5 py-3 rounded-2xl bg-secondary-container text-on-secondary-container font-label-md text-label-md shadow-sm transition-all" data-symptom="amarillas" type="button">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">energy_savings_leaf</span>
+<span>Hojas amarillas</span>
+</span>
+<span class="check-icon material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+</button>
+<!-- Insectos (Activo por defecto) -->
+<button class="symptom-btn active-chip flex items-center justify-between px-3.5 py-3 rounded-2xl bg-secondary-container text-on-secondary-container font-label-md text-label-md shadow-sm transition-all" data-symptom="insectos" id="btn-symptom-insectos" type="button">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">pest_control</span>
+<span>Insectos</span>
+</span>
+<span class="check-icon material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+</button>
+</div>
+<!-- Insect Sub-selector Deep Dive (Toggled when Insectos is active) -->
+<div class="space-y-space-xs pt-2" id="insect-selector-panel">
+<div class="bg-surface-container-lowest/80 backdrop-blur-sm p-3.5 rounded-2xl space-y-2">
+<div class="flex items-start justify-between gap-2">
+<div class="space-y-0.5">
+<h3 class="font-title-md text-body-md font-bold text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-secondary">bug_report</span>
+                ¿Qué tipo de insecto crees ver?
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Puedes seleccionar varios si no estás seguro. El diagnóstico se ajustará:
+              </p>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm shrink-0">Multiple</span>
+</div>
+<!-- Insect Details Cards Stack -->
+<div class="space-y-2 pt-1" id="insect-list">
+<!-- Pulgones -->
+<label class="flex items-start gap-3 p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all">
+<input class="mt-1 accent-primary rounded cursor-pointer w-4 h-4" name="insect" type="checkbox" value="pulgones"/>
+<div class="space-y-0.5 min-w-0">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-primary">
+<span class="text-xs">●</span>
+<span>Pulgones</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Insectos pequeños en brotes tiernos, dejan melaza pegajosa.</p>
+</div>
+</label>
+<!-- Cochinillas (Checked) -->
+<label class="flex items-start gap-3 p-2.5 rounded-xl bg-secondary-container/40 hover:bg-secondary-container/60 cursor-pointer transition-all">
+<input checked="" class="mt-1 accent-primary rounded cursor-pointer w-4 h-4" name="insect" type="checkbox" value="cochinillas"/>
+<div class="space-y-0.5 min-w-0">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-primary font-bold">
+<span class="text-xs">◐</span>
+<span>Cochinillas</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Bultos blancos o algodonosos en tallos y envés de las hojas.</p>
+</div>
+</label>
+<!-- Mosca blanca -->
+<label class="flex items-start gap-3 p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all">
+<input class="mt-1 accent-primary rounded cursor-pointer w-4 h-4" name="insect" type="checkbox" value="mosca"/>
+<div class="space-y-0.5 min-w-0">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-primary">
+<span class="text-xs">○</span>
+<span>Mosca blanca</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Pequeñas moscas blancas que vuelan rápido al mover la maceta.</p>
+</div>
+</label>
+<!-- Araña roja -->
+<label class="flex items-start gap-3 p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all">
+<input class="mt-1 accent-primary rounded cursor-pointer w-4 h-4" name="insect" type="checkbox" value="arana"/>
+<div class="space-y-0.5 min-w-0">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-primary">
+<span class="text-xs">◌</span>
+<span>Araña roja</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Fina telaraña sedosa y puntos diminutos amarillos en el envés.</p>
+</div>
+</label>
+<!-- Trips -->
+<label class="flex items-start gap-3 p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all">
+<input class="mt-1 accent-primary rounded cursor-pointer w-4 h-4" name="insect" type="checkbox" value="trips"/>
+<div class="space-y-0.5 min-w-0">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-primary">
+<span class="text-xs">▹</span>
+<span>Trips</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Manchas plateadas grisáceas y puntitos oscuros sobre el haz.</p>
+</div>
+</label>
+<!-- Minadores -->
+<label class="flex items-start gap-3 p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all">
+<input class="mt-1 accent-primary rounded cursor-pointer w-4 h-4" name="insect" type="checkbox" value="minadores"/>
+<div class="space-y-0.5 min-w-0">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-primary">
+<span class="text-xs">≈</span>
+<span>
       <div class="header-actions">
         <button id="installBtn" class="install-btn" type="button" hidden>
           Instalar
