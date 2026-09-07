@@ -517,7 +517,8 @@ select:focus { outline: none; border-color: var(--leaf-600); }
 .plantnet-content { padding: 0 16px 16px; }
 .plantnet-content p { font-size: 13px; color: var(--muted); margin: 0 0 10px; line-height: 1.45; }
 
-#plantnetKey {
+#plantnetKey,
+#geminiKey {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--line);
@@ -527,11 +528,14 @@ select:focus { outline: none; border-color: var(--leaf-600); }
   background: #fff;
   transition: border-color var(--t-fast);
 }
-#plantnetKey:focus { outline: none; border-color: var(--leaf-600); }
+#plantnetKey:focus,
+#geminiKey:focus { outline: none; border-color: var(--leaf-600); }
 
-#identifySpeciesBtn { margin-top: var(--sp-1); }
+#identifySpeciesBtn,
+#analyzeGeminiBtn { margin-top: var(--sp-1); }
 
-#speciesStatus {
+#speciesStatus,
+#geminiStatus {
   display: block;
   margin-top: 10px;
   font-size: 13px;
@@ -793,7 +797,24 @@ select:focus { outline: none; border-color: var(--leaf-600); }
 .prevention li:before { content: "✦"; position: absolute; left: 0; color: #629b68; }
 
 /* History */
-.history-modal h2 { margin-bottom: 20px; }
+.history-modal h2 { margin-bottom: 0; }
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.clear-history-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  color: var(--error);
+  padding: 6px 12px;
+  font: 500 12px "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+.clear-history-btn:hover { background: #fdf0ec; border-color: var(--error); }
 .history-list { display: grid; gap: 10px; }
 .history-item {
   background: #f4f6ef;
@@ -813,9 +834,28 @@ select:focus { outline: none; border-color: var(--leaf-600); }
   display: grid;
   place-items: center;
   color: #2b6542;
+  flex: none;
 }
+.history-content { flex: 1; min-width: 0; }
 .history-item b { font-size: 13px; display: block; }
-.history-item span { font-size: 11px; color: #718078; }
+.history-item span { font-size: 11px; color: #718078; display: block; }
+.history-delete-btn {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  flex: none;
+  transition: all var(--t-fast);
+}
+.history-delete-btn:hover { background: #faeae6; color: var(--error); }
 .no-history { font-size: 14px; color: #718078; padding: 24px 0; text-align: center; }
 
 /* Animations */
@@ -1315,6 +1355,17 @@ body.dark-theme .trust span { color: var(--leaf-600); }
   color: var(--muted);
 }
 
+.casa-error-msg {
+  background: #fdf2f0;
+  border: 1px solid #f2beb6;
+  color: var(--error);
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
 /* Dark theme — Mi casa */
 body.dark-theme .casa-space {
   background: var(--paper);
@@ -1413,3 +1464,16 @@ body.dark-theme #geminiKey {
   border-color: var(--line);
   color: var(--ink);
 }
+
+body.dark-theme .casa-error-msg {
+  background: #351c18;
+  border-color: #612d24;
+  color: #fca597;
+}
+
+body.dark-theme .clear-history-btn {
+  border-color: #5a3a20;
+  color: #fca597;
+}
+body.dark-theme .clear-history-btn:hover { background: #3a201a; }
+body.dark-theme .history-delete-btn:hover { background: #3a201a; color: #fca597; }
