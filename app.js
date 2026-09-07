@@ -8,6 +8,34 @@ let diseaseCatalogPromise = null;
 let selectedInsects = new Set();
 let cameraStream = null;
 
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function safeGetStorage(key, fallback = null) {
+  try {
+    const val = localStorage.getItem(key);
+    return val !== null ? JSON.parse(val) : fallback;
+  } catch (e) {
+    console.warn(`Error al leer localStorage[${key}]:`, e);
+    return fallback;
+  }
+}
+
+function safeSetStorage(key, val) {
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+  } catch (e) {
+    console.warn(`Error al guardar localStorage[${key}]:`, e);
+  }
+}
+
 const db = {
   manchas: {name:'Mancha foliar (posible hongo)', icon:'◌', confidence:'Patrón compatible · confirmar de cerca', copy:'Las manchas suelen aparecer cuando las hojas permanecen húmedas o el aire circula poco. Retira las hojas muy afectadas y observa si las lesiones avanzan.', check:'Comprueba el reverso de las hojas y evita tratar si hay lluvia, mucho calor o viento.', steps:[['Hoy','Sanea y aísla','Retira hojas afectadas con tijeras limpias. No las compostes. Riega solo el sustrato.'],['Día 3','Tratamiento preventivo','Si el problema avanza, consulta un producto fungicida autorizado para tu planta (por ejemplo, cobre o bicarbonato potásico) y sigue estrictamente la etiqueta.'],['Día 10','Revisión y repetición','Revisa los brotes nuevos. Repite solo si la etiqueta del producto y el estado de la planta lo indican.']], prevent:['Riega a primera hora y siempre a nivel del sustrato.','Deja espacio entre plantas para que circule el aire.','Revisa hojas nuevas una vez a la semana y retira las caídas.']},
   polvo: {name:'Oídio (posible hongo)', icon:'◒', confidence:'Patrón compatible · confirmar de cerca', copy:'El aspecto blanquecino y pulverulento es compatible con oídio. Suele avanzar con humedad ambiental y ventilación limitada.', check:'No pulverices productos bajo sol directo. Verifica que el polvo no sea residuo de riego.', steps:[['Hoy','Poda suave y ventilación','Retira las hojas más cubiertas, limpia las herramientas y mejora la circulación de aire.'],['Día 3','Tratamiento indicado','Consulta un fungicida autorizado para oídio en este cultivo. Azufre o bicarbonato potásico son opciones habituales según el cultivo; respeta siempre etiqueta y plazo de seguridad.'],['Día 10','Control de progreso','Mira los brotes nuevos. Si siguen limpios, mantén cuidados; si reaparece, consulta el uso repetido indicado en la etiqueta.']], prevent:['Mantén la planta con buena ventilación y luz apropiada.','Evita exceso de abonado nitrogenado.','Inspecciona semanalmente los brotes tiernos.']},
@@ -40,7 +68,7 @@ const insectDb = {
       ['Día 3', 'Tratamiento con aceite de neem', 'Aplica aceite de neem autorizado al atardecer, cubriendo todos los bultos. Repite cada 7 días si es necesario.'],
       ['Día 14', 'Revisión profunda', 'Revisa tallos y envés. Las cochinillas pueden esconderse en oquedades. Si persiste, repite el tratamiento o consulta un profesional.']
     ],
-    prevent: ['Inspecciona las uniones de hojas y tallos al regar.', 'Las cochinillas prefieren ambientes secos y con poca ventilación.', 'Cuantaa plantas nuevas durante dos semanas antes de integrarlas.']
+    prevent: ['Inspecciona las uniones de hojas y tallos al regar.', 'Las cochinillas prefieren ambientes secos y con poca ventilación.', 'Mantén en cuarentena las plantas nuevas durante dos semanas antes de integrarlas.']
   },
   moscaBlanca: {
     name: 'Plaga de mosca blanca',
@@ -141,16 +169,24 @@ function renderModal(){
 function closeAllModals(){
   document.querySelectorAll('.modal-backdrop').forEach(modal => { modal.hidden = true; });
   document.body.style.overflow = '';
+  casaEditingId = null;
+  const casaErrorMsg = $('#casaErrorMsg');
+  if (casaErrorMsg) casaErrorMsg.hidden = true;
 }
 
-function open(id){
+function openModal(id){
   closeAllModals();
   if (id === 'historyModal') renderHistory();
-  $('#' + id).hidden = false;
+  const el = $('#' + id);
+  if (el) el.hidden = false;
   document.body.style.overflow = 'hidden';
 }
 
-function close(){
+function open(id){
+  openModal(id);
+}
+
+function closeModal(){
   closeAllModals();
 }
 
@@ -223,7 +259,13 @@ function stopCamera() {
   cameraVideo.hidden = true;
   cameraControls.hidden = true;
   if (cameraButton) cameraButton.style.display = '';
-  if (photoPlaceholder) photoPlaceholder.style.display = '';
+  if (imageFile) {
+    const preview = $('#preview');
+    if (preview) preview.hidden = false;
+    if (photoPlaceholder) photoPlaceholder.style.display = 'none';
+  } else {
+    if (photoPlaceholder) photoPlaceholder.style.display = '';
+  }
 }
 
 if (cameraButton) {
@@ -238,11 +280,13 @@ if (captureBtn) {
     if (!cameraStream) return;
     const vw = cameraVideo.videoWidth;
     const vh = cameraVideo.videoHeight;
+    if (!vw || !vh) return;
     cameraCanvas.width = vw;
     cameraCanvas.height = vh;
     const ctx = cameraCanvas.getContext('2d');
     ctx.drawImage(cameraVideo, 0, 0, vw, vh);
     cameraCanvas.toBlob(blob => {
+      if (!blob) return;
       const file = new File([blob], `foto-${Date.now()}.jpg`, { type: 'image/jpeg' });
       stopCamera();
       handlePhotoFile(file);
@@ -394,6 +438,7 @@ async function analyzePhotoLocally() {
         chip.dataset.value === symptom
       );
     });
+    updateInsectSelector();
 
     photoAnalysisResult = symptom;
 
@@ -433,17 +478,27 @@ if (geminiKeyInput) {
   geminiKeyInput.value = localStorage.getItem('geminiApiKey') || '';
   geminiKeyInput.addEventListener('input', () => {
     localStorage.setItem('geminiApiKey', geminiKeyInput.value.trim());
+    updateIdentifyButton();
+  });
+}
+
+const analyzeGeminiBtn = $('#analyzeGeminiBtn');
+if (analyzeGeminiBtn) {
+  analyzeGeminiBtn.addEventListener('click', () => {
+    analyzeWithGemini();
   });
 }
 
 function updateIdentifyButton() {
   const button = $('#identifySpeciesBtn');
-
-  if (!button || !keyInput) {
-    return;
+  if (button && keyInput) {
+    button.disabled = !(imageFile && keyInput.value.trim());
   }
 
-  button.disabled = !(imageFile && keyInput.value.trim());
+  const geminiBtn = $('#analyzeGeminiBtn');
+  if (geminiBtn && geminiKeyInput) {
+    geminiBtn.disabled = !(imageFile && geminiKeyInput.value.trim());
+  }
 }
 
 async function fileToBase64(file) {
@@ -515,6 +570,7 @@ async function analyzeWithGemini() {
     document.querySelectorAll('.chip').forEach(chip => {
       chip.classList.toggle('selected', chip.dataset.value === symptom);
     });
+    updateInsectSelector();
 
     if (photoAnalysisResult) photoAnalysisResult = symptom;
   } catch (error) {
@@ -650,29 +706,33 @@ $('#analyzeBtn').addEventListener('click', () => {
 });
 
 document.querySelectorAll('[data-close]').forEach(b =>
-  b.addEventListener('click', close)
+  b.addEventListener('click', closeModal)
 );
 
 document.querySelectorAll('.modal-backdrop').forEach(m =>
-  m.addEventListener('click', e => { if (e.target === m) close(); })
+  m.addEventListener('click', e => { if (e.target === m) closeModal(); })
 );
 
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') close();
+  if (event.key === 'Escape') closeModal();
 });
 
-$('#historyBtn').addEventListener('click', () => open('historyModal'));
-$('#openHistory').addEventListener('click', () => open('historyModal'));
+$('#historyBtn').addEventListener('click', () => openModal('historyModal'));
+$('#openHistory').addEventListener('click', () => openModal('historyModal'));
 
-function getPlans(){ return JSON.parse(localStorage.getItem('verdePlans') || '[]'); }
-function setPlans(v){ localStorage.setItem('verdePlans', JSON.stringify(v)); }
+function getPlans(){ return safeGetStorage('verdePlans', []); }
+function setPlans(v){ safeSetStorage('verdePlans', v); }
 
 $('#savePlanBtn').addEventListener('click', () => {
   const d = selectedData();
+  const selectEl = $('#plant');
+  const rawPlant = selectEl.selectedIndex >= 0 ? selectEl.options[selectEl.selectedIndex]?.text : '';
+  const plantName = (!rawPlant || rawPlant === 'Selecciona una planta') ? 'Planta sin especificar' : rawPlant;
+
   const p = {
     id: Date.now(),
     name: d.name,
-    plant: $('#plant').options[$('#plant').selectedIndex].text,
+    plant: plantName,
     date: new Date().toLocaleDateString('es-ES'),
     steps: d.steps,
     done: []
@@ -680,38 +740,102 @@ $('#savePlanBtn').addEventListener('click', () => {
   const plans = getPlans();
   plans.unshift(p);
   setPlans(plans);
-  close();
+  closeModal();
   renderTasks();
-  $('#todaySection').scrollIntoView({ behavior: 'smooth' });
+  const todaySec = $('#todaySection');
+  if (todaySec) todaySec.scrollIntoView({ behavior: 'smooth' });
 });
 
 function renderTasks(){
   const plans = getPlans(), list = $('#taskList'), empty = $('#emptyState');
-  const tasks = plans.flatMap(p => p.steps.map((s, i) => ({ ...p, s, i })));
-  const undone = tasks.filter(t => !t.p.done.includes(t.i));
-  $('#todayCount').textContent = `${undone.length} ${undone.length === 1 ? 'tarea' : 'tareas'}`;
-  empty.hidden = plans.length > 0;
+  if (!list || !empty) return;
+
+  const tasks = plans.flatMap(p => (p.steps || []).map((s, i) => ({
+    planId: p.id,
+    plant: p.plant || 'Planta sin especificar',
+    diagnosis: p.name || 'Diagnóstico',
+    step: s,
+    stepIndex: i,
+    isDone: Array.isArray(p.done) && p.done.includes(i)
+  })));
+
+  const undone = tasks.filter(t => !t.isDone);
+  const countEl = $('#todayCount');
+  if (countEl) {
+    countEl.textContent = `${undone.length} ${undone.length === 1 ? 'tarea' : 'tareas'}`;
+  }
+
+  if (plans.length === 0) {
+    empty.hidden = false;
+    empty.textContent = 'Todavía no tienes tareas pendientes. Guarda un plan después de analizar tu planta.';
+  } else if (undone.length === 0) {
+    empty.hidden = false;
+    empty.textContent = '🎉 ¡Enhorabuena! Has completado todas las tareas de cuidados pendientes.';
+  } else {
+    empty.hidden = true;
+  }
+
   list.innerHTML = undone.map(t =>
-    `<article class="task"><button class="task-check" data-id="${t.p.id}" data-step="${t.i}" aria-label="Marcar como realizada"></button><div class="task-copy"><b>${t.s[1]}</b><span>${t.p.plant} · ${t.p.name}</span></div><span class="task-day">${t.s[0]}</span></article>`
+    `<article class="task"><button class="task-check" data-id="${t.planId}" data-step="${t.stepIndex}" aria-label="Marcar como realizada"></button><div class="task-copy"><b>${escapeHtml(t.step[1])}</b><span>${escapeHtml(t.plant)} · ${escapeHtml(t.diagnosis)}</span></div><span class="task-day">${escapeHtml(t.step[0])}</span></article>`
   ).join('');
+
   document.querySelectorAll('.task-check').forEach(b =>
     b.addEventListener('click', () => {
       let all = getPlans();
       let p = all.find(x => x.id == b.dataset.id);
+      if (!p) return;
       let i = +b.dataset.step;
+      if (!Array.isArray(p.done)) p.done = [];
       p.done.includes(i) ? p.done = p.done.filter(x => x !== i) : p.done.push(i);
       setPlans(all);
       renderTasks();
     })
   );
-  $('#historyDot').classList.toggle('show', plans.length > 0);
+
+  const dot = $('#historyDot');
+  if (dot) dot.classList.toggle('show', plans.length > 0);
 }
 
 function renderHistory(){
-  const p = getPlans(), h = $('#historyList');
-  h.innerHTML = p.length
-    ? p.map(x => `<div class="history-item"><div class="history-icon">⌁</div><div><b>${x.name}</b><span>${x.plant} · guardado el ${x.date} · ${x.done.length}/${x.steps.length} tareas</span></div></div>`).join('')
-    : '<p class="no-history">Todavía no has guardado ninguna revisión.</p>';
+  const p = getPlans(), h = $('#historyList'), clearBtn = $('#clearHistoryBtn');
+  if (clearBtn) clearBtn.hidden = p.length === 0;
+  if (!h) return;
+
+  if (!p.length) {
+    h.innerHTML = '<p class="no-history">Todavía no has guardado ninguna revisión.</p>';
+    return;
+  }
+
+  h.innerHTML = p.map(x => `
+    <div class="history-item">
+      <div class="history-icon">⌁</div>
+      <div class="history-content">
+        <b>${escapeHtml(x.name)}</b>
+        <span>${escapeHtml(x.plant)} · guardado el ${escapeHtml(x.date)} · ${(x.done || []).length}/${(x.steps || []).length} tareas</span>
+      </div>
+      <button class="history-delete-btn" data-id="${x.id}" aria-label="Eliminar del historial">✕</button>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.history-delete-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const plans = getPlans().filter(item => item.id != btn.dataset.id);
+      setPlans(plans);
+      renderHistory();
+      renderTasks();
+    });
+  });
+}
+
+const clearHistoryBtn = $('#clearHistoryBtn');
+if (clearHistoryBtn) {
+  clearHistoryBtn.addEventListener('click', () => {
+    if (confirm('¿Deseas borrar todo el historial y sus tareas?')) {
+      setPlans([]);
+      renderHistory();
+      renderTasks();
+    }
+  });
 }
 
 renderTasks();
@@ -835,11 +959,11 @@ function formatWater(ml) {
 }
 
 function getCasaPlants() {
-  return JSON.parse(localStorage.getItem('verdeCasaPlants') || '[]');
+  return safeGetStorage('verdeCasaPlants', []);
 }
 
 function setCasaPlants(v) {
-  localStorage.setItem('verdeCasaPlants', JSON.stringify(v));
+  safeSetStorage('verdeCasaPlants', v);
 }
 
 const miCasaView = $('#miCasaView');
@@ -863,6 +987,7 @@ const casaWaterDetail = $('#casaWaterDetail');
 let casaEditingId = null;
 
 function showView(view) {
+  stopCamera();
   if (view === 'casa') {
     if (mainShell) mainShell.style.display = 'none';
     miCasaView.hidden = false;
@@ -879,6 +1004,7 @@ function showView(view) {
 }
 
 navCasa.addEventListener('click', () => showView('casa'));
+navInicio.addEventListener('click', () => showView('inicio'));
 casaBackBtn.addEventListener('click', () => showView('inicio'));
 
 const casaBtn = $('#casaBtn');
@@ -888,10 +1014,10 @@ if (casaBtn) {
 
 $('#saveToCasaBtn').addEventListener('click', () => {
   const plantSelect = $('#plant');
-  const detectedName = plantSelect.options[plantSelect.selectedIndex].text;
-  const cleanName = detectedName === 'Selecciona una planta' ? '' : detectedName;
+  const detectedName = plantSelect.selectedIndex >= 0 ? plantSelect.options[plantSelect.selectedIndex]?.text : '';
+  const cleanName = (detectedName === 'Selecciona una planta' || detectedName === 'Planta sin especificar') ? '' : detectedName;
 
-  closeAllModals();
+  closeModal();
 
   casaEditingId = null;
   $('#casaModalTitle').textContent = 'Guardar en Mi casa';
@@ -900,8 +1026,9 @@ $('#saveToCasaBtn').addEventListener('click', () => {
   casaDiameterInput.value = '';
   casaPlantTypeSelect.value = 'tropical';
   casaWaterPreview.hidden = true;
-  casaModal.hidden = false;
-  document.body.style.overflow = 'hidden';
+  const errMsg = $('#casaErrorMsg');
+  if (errMsg) errMsg.hidden = true;
+  openModal('casaModal');
 });
 
 function updateCasaWaterPreview() {
@@ -928,7 +1055,9 @@ casaAddBtn.addEventListener('click', () => {
   casaDiameterInput.value = '';
   casaPlantTypeSelect.value = 'tropical';
   casaWaterPreview.hidden = true;
-  open('casaModal');
+  const errMsg = $('#casaErrorMsg');
+  if (errMsg) errMsg.hidden = true;
+  openModal('casaModal');
 });
 
 casaSaveBtn.addEventListener('click', () => {
@@ -936,16 +1065,25 @@ casaSaveBtn.addEventListener('click', () => {
   const space = casaSpaceSelect.value;
   const diameter = parseFloat(casaDiameterInput.value);
   const plantType = casaPlantTypeSelect.value;
+  const errMsg = $('#casaErrorMsg');
 
   if (!name) {
+    if (errMsg) {
+      errMsg.textContent = 'Por favor, ponle un nombre a tu planta.';
+      errMsg.hidden = false;
+    }
     casaPlantName.focus();
-    casaPlantName.placeholder = 'Ponle un nombre a tu planta';
     return;
   }
-  if (!diameter || diameter < 5) {
+  if (!diameter || diameter < 5 || isNaN(diameter)) {
+    if (errMsg) {
+      errMsg.textContent = 'Introduce un diámetro de maceta válido (mínimo 5 cm).';
+      errMsg.hidden = false;
+    }
     casaDiameterInput.focus();
     return;
   }
+  if (errMsg) errMsg.hidden = true;
 
   const weeklyMl = calculateWeeklyWater(diameter, plantType);
   const plants = getCasaPlants();
@@ -968,24 +1106,28 @@ casaSaveBtn.addEventListener('click', () => {
   }
 
   setCasaPlants(plants);
-  close();
+  closeModal();
   renderCasa();
 });
 
 function renderCasa() {
   const plants = getCasaPlants();
-  const usedSpaces = [...new Set(plants.map(p => p.space))];
+  const usedSpaces = [...new Set(plants.map(p => p.space || 'terraza'))];
   const allSpaces = SPACES.filter(s => usedSpaces.includes(s.value));
+  const unknownSpaces = usedSpaces.filter(u => !SPACES.some(s => s.value === u));
+  if (unknownSpaces.length > 0) {
+    allSpaces.push({ value: 'otros', label: 'Otros espacios', icon: '✦' });
+  }
 
   casaEmpty.hidden = plants.length > 0;
   casaSpacesContainer.innerHTML = allSpaces.map(space => {
-    const spacePlants = plants.filter(p => p.space === space.value);
+    const spacePlants = plants.filter(p => (p.space === space.value) || (space.value === 'otros' && !SPACES.some(s => s.value === p.space)));
     const totalMl = spacePlants.reduce((sum, p) => sum + (p.weeklyMl || 0), 0);
     return `
       <div class="casa-space">
         <div class="casa-space-header">
           <span class="casa-space-icon">${space.icon}</span>
-          <h3>${space.label}</h3>
+          <h3>${escapeHtml(space.label)}</h3>
           <span class="casa-space-count">${spacePlants.length} ${spacePlants.length === 1 ? 'planta' : 'plantas'}</span>
         </div>
         <div class="casa-space-total">💧 ${formatWater(totalMl)} / semana en total</div>
@@ -993,9 +1135,9 @@ function renderCasa() {
           ${spacePlants.map(p => `
             <article class="casa-plant-card" data-id="${p.id}">
               <div class="casa-plant-info">
-                <b>${p.name}</b>
-                <span class="casa-plant-type">${PLANT_TYPES[p.plantType]?.label || 'Planta'}</span>
-                <span class="casa-plant-meta">Maceta ⌀ ${p.diameter} cm</span>
+                <b>${escapeHtml(p.name)}</b>
+                <span class="casa-plant-type">${escapeHtml(PLANT_TYPES[p.plantType]?.label || 'Planta')}</span>
+                <span class="casa-plant-meta">Maceta ⌀ ${escapeHtml(String(p.diameter))} cm</span>
               </div>
               <div class="casa-plant-water">
                 <span class="casa-plant-water-amount">${formatWater(p.weeklyMl)}</span>
@@ -1022,8 +1164,10 @@ function renderCasa() {
       casaSpaceSelect.value = plant.space;
       casaDiameterInput.value = plant.diameter;
       casaPlantTypeSelect.value = plant.plantType;
+      const errMsg = $('#casaErrorMsg');
+      if (errMsg) errMsg.hidden = true;
       updateCasaWaterPreview();
-      open('casaModal');
+      openModal('casaModal');
     });
   });
 
