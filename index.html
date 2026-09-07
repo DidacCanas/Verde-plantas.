@@ -88,7 +88,15 @@
             id="photoInput"
             type="file"
             accept="image/*"
+            capture="environment"
           >
+
+          <video id="cameraStream" autoplay playsinline></video>
+          <canvas id="cameraCanvas" hidden></canvas>
+          <div id="cameraControls" class="camera-controls" hidden>
+            <button id="captureBtn" class="camera-capture-btn" type="button">📸 Capturar</button>
+            <button id="cancelCameraBtn" class="camera-cancel-btn" type="button">Cancelar</button>
+          </div>
         </div>
 
         <div class="form-body">
@@ -136,6 +144,49 @@
               <button class="chip" type="button" data-value="insectos">
                 Insectos
               </button>
+            </div>
+
+            <div id="insectSelector" class="insect-selector" hidden>
+              <p class="insect-selector-title">¿Qué tipo de insecto crees ver?</p>
+              <p class="insect-selector-hint">Puedes seleccionar varios si no estás seguro. El diagnóstico se ajustará a cada uno.</p>
+              <div class="insect-options">
+                <label class="insect-option">
+                  <input type="checkbox" value="pulgones">
+                  <span class="insect-icon">●</span>
+                  <b>Pulgones</b>
+                  <small>Insectos pequeños en brotes tiernos, dejan melaza pegajosa</small>
+                </label>
+                <label class="insect-option">
+                  <input type="checkbox" value="cochinillas">
+                  <span class="insect-icon">◐</span>
+                  <b>Cochinillas</b>
+                  <small>Bultos blancos o algodonosos en tallos y envés</small>
+                </label>
+                <label class="insect-option">
+                  <input type="checkbox" value="moscaBlanca">
+                  <span class="insect-icon">○</span>
+                  <b>Mosca blanca</b>
+                  <small>Pequeñas moscas blancas que vuelan al mover la planta</small>
+                </label>
+                <label class="insect-option">
+                  <input type="checkbox" value="arañaRoja">
+                  <span class="insect-icon">◌</span>
+                  <b>Araña roja</b>
+                  <small>Fina telaraña y puntos amarillos en el envés</small>
+                </label>
+                <label class="insect-option">
+                  <input type="checkbox" value="trips">
+                  <span class="insect-icon">▹</span>
+                  <b>Trips</b>
+                  <small>Manchas plateadas y puntos negros en hojas</small>
+                </label>
+                <label class="insect-option">
+                  <input type="checkbox" value="minadores">
+                  <span class="insect-icon">≈</span>
+                  <b>Minadores</b>
+                  <small>Galerías o caminos sinuosos dentro de las hojas</small>
+                </label>
+              </div>
             </div>
 
             <p id="photoAnalysisStatus" class="photo-analysis-status">

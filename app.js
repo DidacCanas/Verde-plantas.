@@ -5,6 +5,8 @@ let imageFile;
 let previewUrl;
 let photoAnalysisResult = null;
 let diseaseCatalogPromise = null;
+let selectedInsects = new Set();
+let cameraStream = null;
 
 const db = {
   manchas: {name:'Mancha foliar (posible hongo)', icon:'◌', confidence:'Patrón compatible · confirmar de cerca', copy:'Las manchas suelen aparecer cuando las hojas permanecen húmedas o el aire circula poco. Retira las hojas muy afectadas y observa si las lesiones avanzan.', check:'Comprueba el reverso de las hojas y evita tratar si hay lluvia, mucho calor o viento.', steps:[['Hoy','Sanea y aísla','Retira hojas afectadas con tijeras limpias. No las compostes. Riega solo el sustrato.'],['Día 3','Tratamiento preventivo','Si el problema avanza, consulta un producto fungicida autorizado para tu planta (por ejemplo, cobre o bicarbonato potásico) y sigue estrictamente la etiqueta.'],['Día 10','Revisión y repetición','Revisa los brotes nuevos. Repite solo si la etiqueta del producto y el estado de la planta lo indican.']], prevent:['Riega a primera hora y siempre a nivel del sustrato.','Deja espacio entre plantas para que circule el aire.','Revisa hojas nuevas una vez a la semana y retira las caídas.']},
@@ -13,7 +15,115 @@ const db = {
   insectos: {name:'Plaga de insectos chupadores', icon:'◉', confidence:'Necesita confirmación visual', copy:'Pulgones, cochinillas o mosca blanca pueden deformar hojas y dejar melaza. Identificar el insecto concreto mejora mucho el tratamiento.', check:'Mira el envés de las hojas y los tallos. Aísla la planta mientras confirmas la plaga.', steps:[['Hoy','Retirada mecánica','Ducha suave sobre el envés o retira insectos con un paño húmedo. Aísla la planta y revisa las cercanas.'],['Día 3','Control dirigido','Para plagas leves, consulta jabón potásico o aceite de neem autorizados para tu cultivo. Aplica al atardecer y según la etiqueta.'],['Día 10','Revisión completa','Revisa brotes y envés. Repite solo según la etiqueta; si persiste, consulta un vivero o técnico.']], prevent:['Inspecciona el envés de las hojas al regar.','Aísla las plantas nuevas durante una o dos semanas.','Evita excesos de fertilizante que atraen brotes muy tiernos.']}
 };
 
-function selectedData(){ return db[symptom]; }
+const insectDb = {
+  pulgones: {
+    name: 'Plaga de pulgones',
+    icon: '●',
+    confidence: 'Compatibilidad alta con pulgones · confirma con lupa',
+    copy: 'Los pulgones son insectos pequeños (1-3 mm) que se agrupan en brotes tiernos y el envés de las hojas. Chupan la savia y dejan una melaza pegajosa que puede provocar hongos negros (negrilla).',
+    check: 'Busca colonias en los brotes nuevos y bajo las hojas. La melaza pegajosa en hojas o suelo es una pista clave.',
+    steps: [
+      ['Hoy', 'Retirada y limpieza', 'Lava los brotes con agua a presión suave o frota con un paño húmedo. Retira hojas muy afectadas y aísla la planta.'],
+      ['Día 2', 'Control biológico o jabón potásico', 'Aplica jabón potásico autorizado al atardecer, cubriendo bien el envés. Si prefieres control biológico, introduce mariquitas o crisopas si es posible.'],
+      ['Día 7', 'Revisión y repetición', 'Revisa brotes nuevos. Repite el jabón si quedan colonias. Si la plaga es masiva, consulta un insecticida sistémico autorizado.']
+    ],
+    prevent: ['Revisa los brotes tiernos cada 3-4 días en primavera.', 'Evita exceso de nitrógeno que produce brotes muy suculentos.', 'Fomenta fauna auxiliar como mariquitas y crisopas.']
+  },
+  cochinillas: {
+    name: 'Plaga de cochinillas',
+    icon: '◐',
+    confidence: 'Compatibilidad alta con cochinillas · confirma con lupa',
+    copy: 'Las cochinillas aparecen como bultos blancos, marrones o algodonosos en tallos, nervios y envés de hojas. Son difíciles de ver como insectos porque suelen estar cubiertas de una capa protectora.',
+    check: 'Rasca suavemente los bultos blancos: si se desprenden y hay un líquido amarillento o rosado, es cochinilla. Revisa uniones de hojas y tallos.',
+    steps: [
+      ['Hoy', 'Retirada manual', 'Retira las cochinillas con un bastoncillo empapado en alcohol o aceite. Lava la planta con agua y jabón suave. Aísla la planta.'],
+      ['Día 3', 'Tratamiento con aceite de neem', 'Aplica aceite de neem autorizado al atardecer, cubriendo todos los bultos. Repite cada 7 días si es necesario.'],
+      ['Día 14', 'Revisión profunda', 'Revisa tallos y envés. Las cochinillas pueden esconderse en oquedades. Si persiste, repite el tratamiento o consulta un profesional.']
+    ],
+    prevent: ['Inspecciona las uniones de hojas y tallos al regar.', 'Las cochinillas prefieren ambientes secos y con poca ventilación.', 'Cuantaa plantas nuevas durante dos semanas antes de integrarlas.']
+  },
+  moscaBlanca: {
+    name: 'Plaga de mosca blanca',
+    icon: '○',
+    confidence: 'Compatibilidad alta con mosca blanca · confirma visualmente',
+    copy: 'La mosca blanca es una pequeña polilla blanca (1-2 mm) que se levanta al tocar la planta. Sus larvas se fijan en el envés y chupan la savia, debilitando la planta y transmitiendo virus.',
+    check: 'Agita suavemente la planta: si vuelan pequeñas moscas blancas, confirma la plaga. Revisa el envés de las hojas para ver larvas.',
+    steps: [
+      ['Hoy', 'Trampas y limpieza', 'Coloca trampas cromáticas amarillas cerca de la planta. Lava el envés con agua o jabón potásico. Aísla la planta.'],
+      ['Día 3', 'Aplicación de jabón potásico o neem', 'Aplica al atardecer cubriendo bien el envés. Repite cada 5-7 días, ya que las larvas son resistentes y eclosionan en oleadas.'],
+      ['Día 14', 'Control continuo', 'La mosca blanca requiere constancia. Mantén las trampas y revisa cada semana. Si la plaga es severa, consulta un insecticida autorizado.']
+    ],
+    prevent: ['Coloca trampas amarillas desde primavera.', 'Revisa el envés de hojas nuevas semanalmente.', 'Evita el hacinamiento de plantas que dificulta la ventilación.']
+  },
+  arañaRoja: {
+    name: 'Ácaro de la araña roja',
+    icon: '◌',
+    confidence: 'Compatibilidad alta con araña roja · confirma con lupa',
+    copy: 'El ácaro de la araña roja es diminuto (0,5 mm) y difícil de ver a simple vista. Provoca puntos amarillos en las hojas, y en casos avanzados deja una fina telaraña en el envés. Prolifera en ambientes secos y calurosos.',
+    check: 'Pasa un paño blanco por el envés: si hay puntos rojizos que se mueven, es araña roja. Busca telarañas finas entre las hojas.',
+    steps: [
+      ['Hoy', 'Aumentar humedad y limpieza', 'Pulveriza agua sobre el envés para aumentar la humedad (los ácaros la detestan). Lava las hojas afectadas. Aísla la planta.'],
+      ['Día 2', 'Aceite de neem o acaricida autorizado', 'Aplica aceite de neem o un acaricida específico autorizado al atardecer. Cubre bien el envés, donde se esconden los ácaros.'],
+      ['Día 7', 'Repetición obligatoria', 'Los huevos sobreviven al tratamiento. Repite a los 7 días para eliminar las nuevas eclosiones. Mantén la humedad alta.']
+    ],
+    prevent: ['Pulveriza agua en el envés en tiempo seco y caluroso.', 'Mantén la humedad ambiental por encima del 50%.', 'Revisa el envés de las hojas en verano cada pocos días.']
+  },
+  trips: {
+    name: 'Plaga de trips',
+    icon: '▹',
+    confidence: 'Compatibilidad alta con trips · confirma con lupa',
+    copy: 'Los trips son insectos muy finos (1-2 mm) que raspan la superficie de las hojas y absorben los jugos. Provocan manchas plateadas brillantes y puntos negros (sus excrementos) en hojas y flores.',
+    check: 'Busca manchas plateadas y puntos negros en hojas y flores. Los trips son muy móviles y saltan al ser molestados.',
+    steps: [
+      ['Hoy', 'Limpieza y trampas azules', 'Lava las hojas afectadas con agua. Coloca trampas cromáticas azules, que atraen específicamente a los trips. Aísla la planta.'],
+      ['Día 3', 'Jabón potásico o aceite de neem', 'Aplica al atardecer cubriendo bien flores y envés. Repite cada 5 días, ya que los trips tienen ciclo rápido y resisten en el sustrato.'],
+      ['Día 12', 'Revisión y control del sustrato', 'Algunas larvas caen al sustrato. Retira hojas caídas y mantén el sustrato limpio. Si persiste, consulta un insecticida autorizado.']
+    ],
+    prevent: ['Coloca trampas azules desde primavera.', 'Retira hojas y flores caídas del sustrato.', 'Revisa flores y hojas jóvenes cada semana.']
+  },
+  minadores: {
+    name: 'Plaga de minadores',
+    icon: '≈',
+    confidence: 'Compatibilidad alta con minadores · confirma visualmente',
+    copy: 'Los minadores son larvas de pequeñas moscas que se introducen dentro de las hojas y excavan galerías sinuosas, dejando un camino visible en la superficie. La larva está dentro de la hoja, protegida.',
+    check: 'Busca líneas sinuosas o zonas transparentes dentro de las hojas. Si ves el final de la galería, puede haber una larva o pupa visible.',
+    steps: [
+      ['Hoy', 'Retirada de hojas afectadas', 'Corta y destruye las hojas con galerías. No las compostes. Aísla la planta y revisa las cercanas.'],
+      ['Día 5', 'Control del sustrato', 'Las larvas caen al sustrato para pupar. Cubre el sustrato con una capa de arena fina o retira hojas caídas para interrumpir el ciclo.'],
+      ['Día 14', 'Revisión de nuevas galerías', 'Revisa hojas nuevas. Si aparecen galerías, repite la retirada de hojas. En casos severos, consulta un insecticida sistémico autorizado.']
+    ],
+    prevent: ['Retira rápidamente las hojas con galerías.', 'Mantén el sustrato limpio de hojas caídas.', 'Inspecciona hojas nuevas cada semana en primavera y otoño.']
+  }
+};
+
+function selectedData(){
+  if (symptom === 'insectos' && selectedInsects.size > 0) {
+    return buildMultiInsectDiagnosis();
+  }
+  return db[symptom];
+}
+
+function buildMultiInsectDiagnosis() {
+  const insects = [...selectedInsects];
+  if (insects.length === 1) {
+    return insectDb[insects[0]];
+  }
+  const names = insects.map(k => insectDb[k].name.replace('Plaga de ', '').replace('Ácaro de la ', ''));
+  const combined = {
+    name: `Plaga combinada: ${names.join(' + ')}`,
+    icon: '◉',
+    confidence: 'Múltiples plagas detectadas · requiere atención urgente',
+    copy: `Se han identificado varios tipos de insectos: ${names.join(', ')}. Las plagas combinadas son más difíciles de controlar y pueden debilitar la planta rápidamente. Es importante actuar de forma coordinada.`,
+    check: 'Revisa cada tipo de plaga por separado. Prioriza el control mecánico (retirada manual) antes de aplicar productos, y respeta los plazos de seguridad entre tratamientos.',
+    steps: [
+      ['Hoy', 'Retirada mecánica general', 'Lava la planta con agua suave cubriendo envés y tallos. Retira manualmente insectos visibles y bultos. Aísla la planta de forma inmediata.'],
+      ['Día 2', 'Tratamiento combinado autorizado', 'Aplica jabón potásico o aceite de neem al atardecer, cubriendo toda la planta. Estos productos son compatibles con la mayoría de plagas listadas. Respeta la etiqueta.'],
+      ['Día 7', 'Revisión por tipo de plaga', 'Revisa cada insecto por separado: pulgones en brotes, cochinillas en tallos, mosca en envés. Repite el tratamiento donde persista la plaga.']
+    ],
+    prevent: ['Inspecciona el envés de las hojas y los tallos cada 3-4 días.', 'Aísla las plantas nuevas durante al menos dos semanas.', 'Fomenta fauna auxiliar (mariquitas, crisopas) para control natural.']
+  };
+  return combined;
+}
 
 function renderModal(){
   const d = selectedData();
@@ -49,31 +159,115 @@ document.querySelectorAll('.chip').forEach(b =>
     document.querySelectorAll('.chip').forEach(x => x.classList.remove('selected'));
     b.classList.add('selected');
     symptom = b.dataset.value;
+    updateInsectSelector();
   })
 );
 
-$('#photoInput').addEventListener('change', async event => {
-  const file = event.target.files?.[0];
-
-  if (!file) {
-    return;
+function updateInsectSelector() {
+  const selector = $('#insectSelector');
+  if (!selector) return;
+  if (symptom === 'insectos') {
+    selector.hidden = false;
+  } else {
+    selector.hidden = true;
+    selectedInsects.clear();
+    document.querySelectorAll('#insectSelector input[type="checkbox"]').forEach(cb => cb.checked = false);
   }
+}
+
+document.querySelectorAll('#insectSelector input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    if (cb.checked) {
+      selectedInsects.add(cb.value);
+    } else {
+      selectedInsects.delete(cb.value);
+    }
+  });
+});
+
+/* ── Cámara directa con getUserMedia ── */
+const photoInput = $('#photoInput');
+const cameraVideo = $('#cameraStream');
+const cameraCanvas = $('#cameraCanvas');
+const cameraControls = $('#cameraControls');
+const captureBtn = $('#captureBtn');
+const cancelCameraBtn = $('#cancelCameraBtn');
+const cameraButton = document.querySelector('.camera-button');
+const photoPlaceholder = $('#photoPlaceholder');
+const photoArea = document.querySelector('.photo-area');
+
+async function startCamera() {
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment' },
+      audio: false
+    });
+    cameraVideo.srcObject = cameraStream;
+    cameraVideo.hidden = false;
+    cameraControls.hidden = false;
+    if (cameraButton) cameraButton.style.display = 'none';
+    if (photoPlaceholder) photoPlaceholder.style.display = 'none';
+    const preview = $('#preview');
+    if (preview) preview.hidden = true;
+  } catch (err) {
+    console.warn('No se pudo abrir la cámara directamente, usando selector de archivo:', err);
+    if (photoInput) photoInput.click();
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  cameraVideo.hidden = true;
+  cameraControls.hidden = true;
+  if (cameraButton) cameraButton.style.display = '';
+  if (photoPlaceholder) photoPlaceholder.style.display = '';
+}
+
+if (cameraButton) {
+  cameraButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    startCamera();
+  });
+}
+
+if (captureBtn) {
+  captureBtn.addEventListener('click', () => {
+    if (!cameraStream) return;
+    const vw = cameraVideo.videoWidth;
+    const vh = cameraVideo.videoHeight;
+    cameraCanvas.width = vw;
+    cameraCanvas.height = vh;
+    const ctx = cameraCanvas.getContext('2d');
+    ctx.drawImage(cameraVideo, 0, 0, vw, vh);
+    cameraCanvas.toBlob(blob => {
+      const file = new File([blob], `foto-${Date.now()}.jpg`, { type: 'image/jpeg' });
+      stopCamera();
+      handlePhotoFile(file);
+    }, 'image/jpeg', 0.9);
+  });
+}
+
+if (cancelCameraBtn) {
+  cancelCameraBtn.addEventListener('click', stopCamera);
+}
+
+async function handlePhotoFile(file) {
+  if (!file) return;
 
   if (!file.type.startsWith('image/')) {
-    $('#photoAnalysisStatus').textContent =
-      'Selecciona una imagen válida.';
+    $('#photoAnalysisStatus').textContent = 'Selecciona una imagen válida.';
     return;
   }
 
   if (file.size > 8 * 1024 * 1024) {
-    $('#photoAnalysisStatus').textContent =
-      'La imagen es demasiado grande. Máximo recomendado: 8 MB.';
+    $('#photoAnalysisStatus').textContent = 'La imagen es demasiado grande. Máximo recomendado: 8 MB.';
     return;
   }
 
-  if (previewUrl) {
-    URL.revokeObjectURL(previewUrl);
-  }
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
 
   imageFile = file;
   previewUrl = URL.createObjectURL(file);
@@ -84,8 +278,7 @@ $('#photoInput').addEventListener('change', async event => {
 
   $('#photoPlaceholder').hidden = true;
 
-  $('#photoAnalysisStatus').textContent =
-    'Foto recibida. Analizando síntomas…';
+  $('#photoAnalysisStatus').textContent = 'Foto recibida. Analizando síntomas…';
 
   await analyzePhotoLocally();
 
@@ -94,6 +287,12 @@ $('#photoInput').addEventListener('change', async event => {
   identifySpeciesAutomatically();
   identifyDiseaseAutomatically();
   analyzeWithGemini();
+}
+
+$('#photoInput').addEventListener('change', async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  await handlePhotoFile(file);
 });
 async function analyzePhotoLocally() {
   if (!imageFile) {

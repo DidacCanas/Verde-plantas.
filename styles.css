@@ -66,7 +66,7 @@ body {
 
 /* Topbar */
 .topbar {
-  height: 56px;
+  height: 68px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -75,7 +75,7 @@ body {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .install-btn {
@@ -115,9 +115,9 @@ body {
   border: 1px solid var(--line);
   background: var(--paper);
   border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 24px;
+  width: 54px;
+  height: 54px;
+  font-size: 28px;
   color: var(--forest-700);
   position: relative;
   cursor: pointer;
@@ -254,6 +254,146 @@ body {
 .camera-button:first-letter { font-size: 20px; }
 
 #photoInput { display: none; }
+
+/* Camera stream */
+#cameraStream {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 3;
+  background: #000;
+}
+
+.camera-controls {
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.camera-capture-btn {
+  background: var(--forest-700);
+  color: white;
+  border: 0;
+  border-radius: var(--r-pill);
+  padding: 14px 28px;
+  font: 600 16px "DM Sans", sans-serif;
+  cursor: pointer;
+  box-shadow: 0 5px 16px rgba(22, 59, 42, 0.35);
+  transition: background var(--t-fast), transform var(--t-fast);
+}
+.camera-capture-btn:hover { background: var(--forest-900); transform: translateY(-1px); }
+
+.camera-cancel-btn {
+  background: rgba(255,255,255,0.9);
+  color: var(--forest-700);
+  border: 0;
+  border-radius: var(--r-pill);
+  padding: 14px 24px;
+  font: 600 15px "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+.camera-cancel-btn:hover { background: rgba(255,255,255,1); }
+
+/* Insect selector */
+.insect-selector {
+  margin-top: 16px;
+  padding: 18px;
+  background: #f4f7ef;
+  border: 1px solid var(--leaf-200);
+  border-radius: var(--r-md);
+}
+
+.insect-selector-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+
+.insect-selector-hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 14px;
+  line-height: 1.4;
+}
+
+.insect-options {
+  display: grid;
+  gap: 10px;
+}
+
+.insect-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: #fff;
+  cursor: pointer;
+  transition: all var(--t-fast);
+}
+.insect-option:hover { border-color: var(--leaf-400); background: var(--leaf-100); }
+.insect-option:has(input:checked) {
+  border-color: var(--leaf-600);
+  background: #dceecf;
+}
+.insect-option input[type="checkbox"] {
+  margin-top: 3px;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  accent-color: var(--forest-700);
+  cursor: pointer;
+}
+.insect-icon {
+  font-size: 22px;
+  color: var(--forest-700);
+  flex: none;
+  margin-top: 1px;
+}
+.insect-option b {
+  display: block;
+  font-size: 15px;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.insect-option small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Dark theme — insect selector */
+body.dark-theme .insect-selector {
+  background: #162a20;
+  border-color: var(--line);
+}
+body.dark-theme .insect-selector-title { color: var(--ink); }
+body.dark-theme .insect-option {
+  background: #1a2a20;
+  border-color: var(--line);
+}
+body.dark-theme .insect-option:hover {
+  border-color: var(--leaf-400);
+  background: var(--leaf-100);
+}
+body.dark-theme .insect-option:has(input:checked) {
+  border-color: var(--leaf-600);
+  background: #2a5a3e;
+}
+body.dark-theme .insect-option b { color: var(--ink); }
+body.dark-theme .insect-option small { color: var(--muted); }
+body.dark-theme .insect-icon { color: var(--leaf-400); }
 
 /* Form body */
 .form-body { padding: 16px 14px 14px; }
