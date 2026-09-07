@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1b4d3c">
 
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./app-icon.svg" type="image/svg+xml">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
 
   <title>Verde Salud</title>
 
@@ -284,6 +284,16 @@
                 placeholder="Clave API de Gemini"
               >
 
+              <button
+                id="analyzeGeminiBtn"
+                class="primary secondary-action"
+                type="button"
+                disabled
+              >
+                <span>Analizar con Gemini IA</span>
+                <b>✦</b>
+              </button>
+
               <span id="geminiStatus"></span>
             </div>
           </div>
@@ -345,10 +355,10 @@
   </div>
 
   <nav class="bottom-nav" aria-label="Navegación principal">
-    <a href="./" class="active" id="navInicio">
+    <button type="button" class="active" id="navInicio">
       <span>⌂</span>
       Inicio
-    </a>
+    </button>
 
     <button id="navCasa" type="button">
       <span>⌂</span>
@@ -408,7 +418,10 @@
   <div id="historyModal" class="modal-backdrop" hidden>
     <section class="modal history-modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
       <button class="close" type="button" data-close aria-label="Cerrar">×</button>
-      <h2 id="historyTitle">Historial</h2>
+      <div class="history-header">
+        <h2 id="historyTitle">Historial</h2>
+        <button id="clearHistoryBtn" class="clear-history-btn" type="button" hidden>Borrar todo</button>
+      </div>
       <div id="historyList" class="history-list"></div>
     </section>
   </div>
@@ -467,6 +480,8 @@
           </div>
         </div>
 
+        <div id="casaErrorMsg" class="casa-error-msg" hidden role="alert"></div>
+
         <button id="casaSaveBtn" class="primary" type="button">
           <span>Guardar planta</span>
           <b>→</b>
@@ -478,7 +493,7 @@
   <script src="./app.js"></script>
 
   <script>
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js')
           .catch(error => {
