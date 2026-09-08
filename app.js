@@ -199,6 +199,17 @@ document.querySelectorAll('.chip').forEach(b =>
   })
 );
 
+document.querySelectorAll('.species-pills [data-plant]').forEach(button => {
+  button.addEventListener('click', () => {
+    const select = $('#plant');
+    if (!select) return;
+    select.value = button.dataset.plant || '';
+    document.querySelectorAll('.species-pills [data-plant]').forEach(item => {
+      item.classList.toggle('selected', item === button);
+    });
+  });
+});
+
 function updateInsectSelector() {
   const selector = $('#insectSelector');
   if (!selector) return;
@@ -767,10 +778,10 @@ function renderTasks(){
 
   if (plans.length === 0) {
     empty.hidden = false;
-    empty.textContent = 'Todavía no tienes tareas pendientes. Guarda un plan después de analizar tu planta.';
+    empty.innerHTML = '<span class="empty-icon material-symbols-outlined">water_drop</span><b>Todo en orden por ahora</b><p>Todavía no tienes tareas pendientes para hoy. Guarda un plan de cuidados después de analizar tu planta para activar recordatorios inteligentes de riego y poda.</p><button type="button" onclick="document.getElementById(\'camera-module\').scrollIntoView({behavior:\'smooth\'})"><span class="material-symbols-outlined">add_a_photo</span> Comenzar escaneo</button>';
   } else if (undone.length === 0) {
     empty.hidden = false;
-    empty.textContent = '🎉 ¡Enhorabuena! Has completado todas las tareas de cuidados pendientes.';
+    empty.innerHTML = '<span class="empty-icon material-symbols-outlined">check_circle</span><b>Cuidados completados</b><p>Has terminado todas las tareas de cuidados pendientes.</p>';
   } else {
     empty.hidden = true;
   }
@@ -886,7 +897,7 @@ function applyTheme(dark) {
   themeIconDark.hidden = !dark;
   localStorage.setItem('verdeTheme', dark ? 'dark' : 'light');
   const metaTheme = document.querySelector('meta[name="theme-color"]');
-  if (metaTheme) metaTheme.content = dark ? '#0a1f17' : '#1b4d3c';
+  if (metaTheme) metaTheme.content = dark ? '#0a1f17' : '#032517';
 }
 
 const savedTheme = localStorage.getItem('verdeTheme');
