@@ -266,6 +266,8 @@ body {
   background: #000;
 }
 
+#cameraStream[hidden] { display: none !important; }
+
 .camera-controls {
   position: absolute;
   bottom: 15px;
