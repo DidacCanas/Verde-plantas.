@@ -3,8 +3,9 @@ let symptom = 'manchas';
 let installPrompt;
 let imageFile;
 let previewUrl;
-let photoAnalysisResult = null;
 let diseaseCatalogPromise = null;
+let diseaseCatalogKey = null;
+let analysisToken = 0;
 let selectedInsects = new Set();
 let cameraStream = null;
 
@@ -182,14 +183,6 @@ function openModal(id){
   document.body.style.overflow = 'hidden';
 }
 
-function open(id){
-  openModal(id);
-}
-
-function closeModal(){
-  closeAllModals();
-}
-
 document.querySelectorAll('.chip').forEach(b =>
   b.addEventListener('click', () => {
     document.querySelectorAll('.chip').forEach(x => x.classList.remove('selected'));
@@ -335,20 +328,24 @@ async function handlePhotoFile(file) {
 
   $('#photoAnalysisStatus').textContent = 'Foto recibida. Analizando síntomas…';
 
-  await analyzePhotoLocally();
+  const token = ++analysisToken;
+
+  await analyzePhotoLocally(token);
 
   updateIdentifyButton();
 
-  identifySpeciesAutomatically();
-  identifyDiseaseAutomatically();
-  analyzeWithGemini();
+  identifySpeciesAutomatically(token);
+  identifyDiseaseAutomatically(token);
+  analyzeWithGemini(token);
 }
 
-$('#photoInput').addEventListener('change', async event => {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  await handlePhotoFile(file);
-});
+if (photoInput) {
+  photoInput.addEventListener('change', async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    await handlePhotoFile(file);
+  });
+}
 async function analyzePhotoLocally() {
   if (!imageFile) {
     return;
@@ -443,6 +440,8 @@ async function analyzePhotoLocally() {
       symptom = 'manchas';
     }
 
+    if (token !== undefined && token !== analysisToken) return;
+
     document.querySelectorAll('.chip').forEach(chip => {
       chip.classList.toggle(
         'selected',
@@ -450,8 +449,6 @@ async function analyzePhotoLocally() {
       );
     });
     updateInsectSelector();
-
-    photoAnalysisResult = symptom;
 
     const symptomNames = {
       manchas: 'posibles manchas',
@@ -496,7 +493,7 @@ if (geminiKeyInput) {
 const analyzeGeminiBtn = $('#analyzeGeminiBtn');
 if (analyzeGeminiBtn) {
   analyzeGeminiBtn.addEventListener('click', () => {
-    analyzeWithGemini();
+    analyzeWithGemini(++analysisToken);
   });
 }
 
@@ -521,7 +518,7 @@ async function fileToBase64(file) {
   });
 }
 
-async function analyzeWithGemini() {
+async function analyzeWithGemini(token) {
   if (!imageFile || !geminiKeyInput || !geminiKeyInput.value.trim()) {
     if (aiResultBox) aiResultBox.hidden = true;
     return;
@@ -563,6 +560,8 @@ async function analyzeWithGemini() {
       throw new Error('La IA no devolvió un análisis válido');
     }
 
+    if (token !== undefined && token !== analysisToken) return;
+
     if (aiResultText) aiResultText.textContent = aiText;
     if (aiResultBox) aiResultBox.hidden = false;
     if (geminiStatus) geminiStatus.textContent = 'Análisis completado.';
@@ -578,12 +577,12 @@ async function analyzeWithGemini() {
       symptom = 'manchas';
     }
 
-    document.querySelectorAll('.chip').forEach(chip => {
-      chip.classList.toggle('selected', chip.dataset.value === symptom);
-    });
-    updateInsectSelector();
-
-    if (photoAnalysisResult) photoAnalysisResult = symptom;
+    if (symptom !== 'insectos' || selectedInsects.size === 0) {
+      document.querySelectorAll('.chip').forEach(chip => {
+        chip.classList.toggle('selected', chip.dataset.value === symptom);
+      });
+      updateInsectSelector();
+    }
   } catch (error) {
     if (aiResultBox) aiResultBox.hidden = true;
     if (geminiStatus) geminiStatus.textContent = `No se pudo analizar con IA: ${error.message}`;
@@ -610,7 +609,7 @@ function setDetectedPlant(name){
   select.value = option.value;
 }
 
-async function identifySpeciesAutomatically() {
+async function identifySpeciesAutomatically(token) {
   if (!imageFile || !keyInput || !keyInput.value.trim()) return;
 
   const button = $('#identifySpeciesBtn'), status = $('#speciesStatus');
@@ -627,6 +626,8 @@ async function identifySpeciesAutomatically() {
     if (!response.ok) throw new Error(result.message || 'No se pudo identificar la imagen');
     const top = result.results?.[0];
     if (!top) throw new Error('No se encontró una especie con suficiente coincidencia');
+    if (token !== undefined && token !== analysisToken) return;
+
     const plant = plantNameFromResult(top);
     const confidence = Math.round((top.score || 0) * 100);
     setDetectedPlant(plant.common ? `${plant.common} (${plant.scientific})` : plant.scientific);
@@ -644,7 +645,7 @@ const diseaseName = $('#diseaseName');
 const diseaseConfidence = $('#diseaseConfidence');
 const diseaseDescription = $('#diseaseDescription');
 
-async function identifyDiseaseAutomatically() {
+async function identifyDiseaseAutomatically(token) {
   if (!imageFile || !keyInput || !keyInput.value.trim()) {
     if (diseaseBox) diseaseBox.hidden = true;
     return;
@@ -661,6 +662,7 @@ async function identifyDiseaseAutomatically() {
     const top = result.results?.[0];
     if (!top) throw new Error('No se detectó ninguna enfermedad o plaga con suficiente coincidencia');
     const readableName = await getReadableDiseaseName(top, keyInput.value.trim());
+    if (token !== undefined && token !== analysisToken) return;
     const confidence = Math.round((top.score || 0) * 100);
     const categories = Array.isArray(top.categories) ? top.categories.join(', ') : '';
     diseaseName.textContent = readableName;
@@ -683,7 +685,8 @@ async function getReadableDiseaseName(result, apiKey) {
     return directName;
   }
 
-  if (!diseaseCatalogPromise) {
+  if (!diseaseCatalogPromise || diseaseCatalogKey !== apiKey) {
+    diseaseCatalogKey = apiKey;
     const url = `https://my-api.plantnet.org/v2/diseases?lang=es&api-key=${encodeURIComponent(apiKey)}`;
     diseaseCatalogPromise = fetch(url)
       .then(response => response.ok ? response.json() : [])
@@ -703,7 +706,7 @@ async function getReadableDiseaseName(result, apiKey) {
   return 'Posible enfermedad o plaga no identificada';
 }
 
-$('#identifySpeciesBtn').addEventListener('click', identifySpeciesAutomatically);
+$('#identifySpeciesBtn').addEventListener('click', () => identifySpeciesAutomatically(++analysisToken));
 
 $('#analyzeBtn').addEventListener('click', () => {
   if (!imageFile) {
@@ -713,19 +716,18 @@ $('#analyzeBtn').addEventListener('click', () => {
   }
 
   renderModal();
-  open('resultModal');
+  openModal('resultModal');
 });
 
 document.querySelectorAll('[data-close]').forEach(b =>
-  b.addEventListener('click', closeModal)
+  b.addEventListener('click', closeAllModals)
 );
 
 document.querySelectorAll('.modal-backdrop').forEach(m =>
-  m.addEventListener('click', e => { if (e.target === m) closeModal(); })
+  m.addEventListener('click', e => { if (e.target === m) closeAllModals(); })
 );
-
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') closeModal();
+  if (event.key === 'Escape') closeAllModals();
 });
 
 $('#historyBtn').addEventListener('click', () => openModal('historyModal'));
@@ -751,7 +753,7 @@ $('#savePlanBtn').addEventListener('click', () => {
   const plans = getPlans();
   plans.unshift(p);
   setPlans(plans);
-  closeModal();
+  closeAllModals();
   renderTasks();
   const todaySec = $('#todaySection');
   if (todaySec) todaySec.scrollIntoView({ behavior: 'smooth' });
@@ -803,7 +805,7 @@ function renderTasks(){
     })
   );
 
-  const dot = $('#historyDot');
+  const dot = document.querySelector('#openHistory .dot');
   if (dot) dot.classList.toggle('show', plans.length > 0);
 }
 
@@ -870,11 +872,13 @@ window.addEventListener('appinstalled', () => { $('#installBtn').hidden = true; 
 const plantnetToggle = $('#plantnetToggle');
 const plantnetContent = $('#plantnetContent');
 
-plantnetToggle.addEventListener('click', () => {
-  const expanded = plantnetToggle.getAttribute('aria-expanded') === 'true';
-  plantnetToggle.setAttribute('aria-expanded', String(!expanded));
-  plantnetContent.hidden = expanded;
-});
+if (plantnetToggle) {
+  plantnetToggle.addEventListener('click', () => {
+    const expanded = plantnetToggle.getAttribute('aria-expanded') === 'true';
+    plantnetToggle.setAttribute('aria-expanded', String(!expanded));
+    plantnetContent.hidden = expanded;
+  });
+}
 
 const geminiToggle = $('#geminiToggle');
 const geminiContent = $('#geminiContent');
@@ -1001,22 +1005,22 @@ function showView(view) {
   stopCamera();
   if (view === 'casa') {
     if (mainShell) mainShell.style.display = 'none';
-    miCasaView.hidden = false;
-    navInicio.classList.remove('active');
-    navCasa.classList.add('active');
+    if (miCasaView) miCasaView.hidden = false;
+    if (navInicio) navInicio.classList.remove('active');
+    if (navCasa) navCasa.classList.add('active');
     renderCasa();
     window.scrollTo(0, 0);
   } else {
-    miCasaView.hidden = true;
+    if (miCasaView) miCasaView.hidden = true;
     if (mainShell) mainShell.style.display = '';
-    navCasa.classList.remove('active');
-    navInicio.classList.add('active');
+    if (navCasa) navCasa.classList.remove('active');
+    if (navInicio) navInicio.classList.add('active');
   }
 }
 
-navCasa.addEventListener('click', () => showView('casa'));
-navInicio.addEventListener('click', () => showView('inicio'));
-casaBackBtn.addEventListener('click', () => showView('inicio'));
+if (navCasa) navCasa.addEventListener('click', () => showView('casa'));
+if (navInicio) navInicio.addEventListener('click', () => showView('inicio'));
+if (casaBackBtn) casaBackBtn.addEventListener('click', () => showView('inicio'));
 
 const casaBtn = $('#casaBtn');
 if (casaBtn) {
@@ -1028,7 +1032,7 @@ $('#saveToCasaBtn').addEventListener('click', () => {
   const detectedName = plantSelect.selectedIndex >= 0 ? plantSelect.options[plantSelect.selectedIndex]?.text : '';
   const cleanName = (detectedName === 'Selecciona una planta' || detectedName === 'Planta sin especificar') ? '' : detectedName;
 
-  closeModal();
+  closeAllModals();
 
   casaEditingId = null;
   $('#casaModalTitle').textContent = 'Guardar en Mi casa';
@@ -1117,7 +1121,7 @@ casaSaveBtn.addEventListener('click', () => {
   }
 
   setCasaPlants(plants);
-  closeModal();
+  closeAllModals();
   renderCasa();
 });
 

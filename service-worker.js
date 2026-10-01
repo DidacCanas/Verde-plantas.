@@ -1,4 +1,4 @@
-const CACHE_NAME = 'verde-salud-v20';
+const CACHE_NAME = 'verde-salud-v21';
 
 const APP_FILES = [
   './',
@@ -6,10 +6,10 @@ const APP_FILES = [
   './styles.css',
   './mobile.css',
   './improved-mobile.css',
+  './stitch-theme.css',
   './app.js',
   './manifest.webmanifest',
-  './icon.svg',
-  './app-icon.svg'
+  './icon.svg'
 ];
 
 self.addEventListener('install', event => {
