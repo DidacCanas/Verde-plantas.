@@ -853,6 +853,204 @@ if (clearHistoryBtn) {
 
 renderTasks();
 
+/* ──────────────────────────────────────────────────────────
+   Calendario de cuidados
+   ────────────────────────────────────────────────────────── */
+
+const MONTH_NAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const WEEKDAY_LABELS = ['L','M','X','J','V','S','D'];
+
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let calSelectedDate = null;
+
+function parseStepDay(label) {
+  if (!label) return 0;
+  if (label === 'Hoy') return 0;
+  const m = label.match(/D[ií]a\s*(\d+)/i);
+  return m ? parseInt(m[1], 10) : 0;
+}
+
+function getCalendarTasks() {
+  const plans = getPlans();
+  const tasks = [];
+  for (const p of plans) {
+    const baseMs = typeof p.id === 'number' ? p.id : Date.parse(p.date) || Date.now();
+    const baseDate = new Date(baseMs);
+    (p.steps || []).forEach((s, i) => {
+      const offset = parseStepDay(s[0]);
+      const taskDate = new Date(baseDate);
+      taskDate.setDate(taskDate.getDate() + offset);
+      taskDate.setHours(0, 0, 0, 0);
+      tasks.push({
+        date: taskDate,
+        dateKey: taskDate.toISOString().slice(0, 10),
+        plant: p.plant || 'Planta sin especificar',
+        diagnosis: p.name || 'Diagnóstico',
+        stepLabel: s[0],
+        stepTitle: s[1],
+        stepDesc: s[2],
+        isDone: Array.isArray(p.done) && p.done.includes(i),
+        planId: p.id,
+        stepIndex: i
+      });
+    });
+  }
+  return tasks;
+}
+
+function renderCalendar() {
+  const grid = $('#calGrid');
+  const label = $('#calMonthLabel');
+  if (!grid || !label) return;
+
+  label.textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
+
+  const tasks = getCalendarTasks();
+  const tasksByDate = {};
+  for (const t of tasks) {
+    if (!tasksByDate[t.dateKey]) tasksByDate[t.dateKey] = [];
+    tasksByDate[t.dateKey].push(t);
+  }
+
+  const firstDay = new Date(calYear, calMonth, 1);
+  const lastDay = new Date(calYear, calMonth + 1, 0);
+  const startWeekday = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = lastDay.getDate();
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayKey = today.toISOString().slice(0, 10);
+
+  let html = '';
+  for (const w of WEEKDAY_LABELS) {
+    html += `<span class="cal-dow">${w}</span>`;
+  }
+  for (let i = 0; i < startWeekday; i++) {
+    html += '<span class="cal-cell cal-empty-cell"></span>';
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const cellDate = new Date(calYear, calMonth, d);
+    cellDate.setHours(0, 0, 0, 0);
+    const key = cellDate.toISOString().slice(0, 10);
+    const dayTasks = tasksByDate[key] || [];
+    const hasTasks = dayTasks.length > 0;
+    const allDone = hasTasks && dayTasks.every(t => t.isDone);
+    const hasPending = hasTasks && !allDone;
+    const isToday = key === todayKey;
+    const isSelected = calSelectedDate && key === calSelectedDate.toISOString().slice(0, 10);
+
+    const classes = ['cal-cell'];
+    if (hasTasks) classes.push('has-tasks');
+    if (allDone) classes.push('all-done');
+    if (hasPending) classes.push('has-pending');
+    if (isToday) classes.push('is-today');
+    if (isSelected) classes.push('is-selected');
+
+    html += `<button type="button" class="${classes.join(' ')}" data-date="${key}">
+      <span class="cal-num">${d}</span>
+      ${hasTasks ? `<span class="cal-dot ${allDone ? 'done' : ''}"></span>` : ''}
+    </button>`;
+  }
+  grid.innerHTML = html;
+
+  grid.querySelectorAll('.cal-cell[data-date]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      calSelectedDate = new Date(btn.dataset.date + 'T00:00:00');
+      renderCalendar();
+      renderCalendarDayDetail();
+    });
+  });
+
+  const empty = $('#calEmpty');
+  if (empty) {
+    const monthHasTasks = tasks.some(t => t.date.getFullYear() === calYear && t.date.getMonth() === calMonth);
+    empty.hidden = monthHasTasks;
+  }
+
+  if (calSelectedDate) renderCalendarDayDetail();
+}
+
+function renderCalendarDayDetail() {
+  const detail = $('#calDayDetail');
+  const dateEl = $('#calDayDate');
+  const countEl = $('#calDayCount');
+  const tasksEl = $('#calDayTasks');
+  if (!detail || !calSelectedDate) return;
+
+  const key = calSelectedDate.toISOString().slice(0, 10);
+  const tasks = getCalendarTasks().filter(t => t.dateKey === key);
+
+  dateEl.textContent = calSelectedDate.toLocaleDateString('es-ES', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+
+  if (tasks.length === 0) {
+    countEl.textContent = 'Sin tareas';
+    tasksEl.innerHTML = '<p class="cal-no-tasks">No hay tareas programadas para este día.</p>';
+  } else {
+    const undone = tasks.filter(t => !t.isDone).length;
+    countEl.textContent = `${undone} ${undone === 1 ? 'pendiente' : 'pendientes'} · ${tasks.length} total`;
+    tasksEl.innerHTML = tasks.map(t =>
+      `<article class="task${t.isDone ? ' task-done' : ''}">
+        <button class="task-check${t.isDone ? ' checked' : ''}" data-id="${t.planId}" data-step="${t.stepIndex}" aria-label="Marcar como realizada"></button>
+        <div class="task-copy">
+          <b>${escapeHtml(t.stepTitle)}</b>
+          <span>${escapeHtml(t.plant)} · ${escapeHtml(t.diagnosis)}</span>
+          <small>${escapeHtml(t.stepDesc)}</small>
+        </div>
+        <span class="task-day">${escapeHtml(t.stepLabel)}</span>
+      </article>`
+    ).join('');
+
+    tasksEl.querySelectorAll('.task-check').forEach(b => {
+      b.addEventListener('click', () => {
+        let all = getPlans();
+        let p = all.find(x => x.id == b.dataset.id);
+        if (!p) return;
+        let i = +b.dataset.step;
+        if (!Array.isArray(p.done)) p.done = [];
+        p.done.includes(i) ? p.done = p.done.filter(x => x !== i) : p.done.push(i);
+        setPlans(all);
+        renderTasks();
+        renderCalendar();
+        renderCalendarDayDetail();
+      });
+    });
+  }
+
+  detail.hidden = false;
+}
+
+const calPrev = $('#calPrev');
+const calNext = $('#calNext');
+const calendarLink = document.querySelector('.calendar-link');
+
+if (calPrev) {
+  calPrev.addEventListener('click', () => {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendar();
+  });
+}
+if (calNext) {
+  calNext.addEventListener('click', () => {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+  });
+}
+if (calendarLink) {
+  calendarLink.addEventListener('click', () => {
+    const now = new Date();
+    calYear = now.getFullYear();
+    calMonth = now.getMonth();
+    calSelectedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    renderCalendar();
+    openModal('calendarModal');
+  });
+}
+
 window.addEventListener('beforeinstallprompt', event => {
   event.preventDefault();
   installPrompt = event;

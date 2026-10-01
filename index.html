@@ -508,6 +508,31 @@
     </section>
   </div>
 
+  <div id="calendarModal" class="modal-backdrop" hidden>
+    <section class="modal calendar-modal" role="dialog" aria-modal="true" aria-labelledby="calendarTitle">
+      <button class="close" type="button" data-close aria-label="Cerrar">×</button>
+      <h2 id="calendarTitle">Calendario de cuidados</h2>
+      <div class="calendar-nav">
+        <button id="calPrev" type="button" aria-label="Mes anterior">‹</button>
+        <span id="calMonthLabel"></span>
+        <button id="calNext" type="button" aria-label="Mes siguiente">›</button>
+      </div>
+      <div id="calGrid" class="calendar-grid"></div>
+      <div id="calDayDetail" class="calendar-day-detail" hidden>
+        <div class="calendar-day-header">
+          <b id="calDayDate"></b>
+          <span id="calDayCount"></span>
+        </div>
+        <div id="calDayTasks" class="calendar-day-tasks"></div>
+      </div>
+      <div id="calEmpty" class="empty-state calendar-empty" hidden>
+        <span class="empty-icon material-symbols-outlined">event_busy</span>
+        <b>Sin tareas esta semana</b>
+        <p>Cuando guardes un plan de cuidados, las tareas aparecerán aquí en su fecha correspondiente.</p>
+      </div>
+    </section>
+  </div>
+
   <script src="./app.js"></script>
 
   <script>
