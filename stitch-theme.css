@@ -555,6 +555,46 @@ body.dark-theme .plantnet-box, body.dark-theme .gemini-box, body.dark-theme .emp
 body.dark-theme .bottom-nav { background: color-mix(in srgb, var(--st-surface) 90%, transparent); }
 body.dark-theme .modal { background: var(--st-surface-lowest); }
 
+/* Backup section */
+.backup-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--st-surface-high); }
+.backup-title { margin: 0 0 6px; color: var(--st-primary); font-family: "Playfair Display", serif; font-size: 18px; font-weight: 600; }
+.backup-hint { margin: 0 0 14px; color: var(--st-text-muted); font-size: 12px; line-height: 18px; }
+.backup-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.backup-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--st-surface-high); border-radius: 999px;
+  padding: 10px 16px; cursor: pointer;
+  color: var(--st-text); background: var(--st-surface-lowest);
+  font-family: "Plus Jakarta Sans", sans-serif; font-size: 13px; font-weight: 600;
+  box-shadow: 0 1px 4px rgba(27,59,43,.04);
+  transition: background .15s, border-color .15s;
+}
+.backup-btn:hover { background: var(--st-surface-low); border-color: var(--st-surface-container); }
+.backup-btn .material-symbols-outlined { font-size: 18px; color: var(--st-secondary); }
+.backup-btn-danger { color: var(--st-error); border-color: color-mix(in srgb, var(--st-error) 30%, transparent); }
+.backup-btn-danger:hover { background: color-mix(in srgb, var(--st-error) 8%, transparent); }
+.backup-status {
+  margin-top: 12px; padding: 10px 14px; border-radius: 12px;
+  font-size: 12px; line-height: 18px;
+  background: color-mix(in srgb, var(--st-secondary) 12%, transparent);
+  color: var(--st-secondary);
+}
+.backup-status[data-error="true"] {
+  background: color-mix(in srgb, var(--st-error) 10%, transparent);
+  color: var(--st-error);
+}
+.backup-confirm {
+  margin-top: 12px; padding: 16px; border-radius: 16px;
+  background: var(--st-surface-low);
+}
+.backup-confirm p { margin: 0 0 12px; color: var(--st-text); font-size: 13px; line-height: 19px; }
+.backup-confirm-actions { display: flex; gap: 10px; }
+
+body.dark-theme .backup-btn { background: var(--st-surface-lowest); border-color: var(--st-surface-high); }
+body.dark-theme .backup-status { background: color-mix(in srgb, var(--st-secondary) 18%, transparent); }
+body.dark-theme .backup-status[data-error="true"] { background: color-mix(in srgb, var(--st-error) 18%, transparent); }
+body.dark-theme .backup-confirm { background: var(--st-surface-container); }
+
 @media (min-width: 700px) {
   .shell { padding: 0 20px 112px; }
   .topbar { height: 68px; }

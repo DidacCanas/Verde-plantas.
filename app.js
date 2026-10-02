@@ -1392,3 +1392,215 @@ function renderCasa() {
     });
   });
 }
+
+/* ──────────────────────────────────────────────────────────
+   Backup — exportación e importación de datos
+   ────────────────────────────────────────────────────────── */
+
+const BACKUP_VERSION = 1;
+const BACKUP_KEYS = ['verdePlans', 'verdeCasaPlants', 'verdeTheme', 'plantnetApiKey', 'geminiApiKey'];
+
+function collectBackupData() {
+  return {
+    exportedAt: new Date().toISOString(),
+    version: BACKUP_VERSION,
+    data: {
+      verdePlans: safeGetStorage('verdePlans', []),
+      verdeCasaPlants: safeGetStorage('verdeCasaPlants', []),
+      verdeTheme: localStorage.getItem('verdeTheme') || 'light',
+      plantnetApiKey: localStorage.getItem('plantnetApiKey') || '',
+      geminiApiKey: localStorage.getItem('geminiApiKey') || ''
+    }
+  };
+}
+
+function validateBackupStructure(obj) {
+  if (!obj || typeof obj !== 'object') return 'El archivo no contiene un objeto válido.';
+  if (typeof obj.version !== 'number') return 'El archivo no contiene un campo version válido.';
+  if (obj.version !== BACKUP_VERSION) return `La versión del backup (${obj.version}) no es compatible con la versión actual (${BACKUP_VERSION}).`;
+  if (!obj.data || typeof obj.data !== 'object') return 'El archivo no contiene el bloque de datos.';
+  for (const key of BACKUP_KEYS) {
+    if (!(key in obj.data)) return `Falta la clave esperada: ${key}.`;
+  }
+  if (!Array.isArray(obj.data.verdePlans)) return 'verdePlans no es un array válido.';
+  if (!Array.isArray(obj.data.verdeCasaPlants)) return 'verdeCasaPlants no es un array válido.';
+  if (typeof obj.data.verdeTheme !== 'string') return 'verdeTheme no es un texto válido.';
+  if (typeof obj.data.plantnetApiKey !== 'string') return 'plantnetApiKey no es un texto válido.';
+  if (typeof obj.data.geminiApiKey !== 'string') return 'geminiApiKey no es un texto válido.';
+  return null;
+}
+
+function generateBackupFilename() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}`;
+  return `verde-backup-${stamp}.json`;
+}
+
+function showBackupStatus(msg, isError) {
+  const el = $('#backupStatus');
+  if (!el) return;
+  el.textContent = msg;
+  el.hidden = false;
+  el.dataset.error = isError ? 'true' : 'false';
+  setTimeout(() => { el.hidden = true; }, 5000);
+}
+
+function exportBackup() {
+  let backup;
+  try {
+    backup = collectBackupData();
+  } catch (e) {
+    showBackupStatus('Error al recopilar los datos: ' + e.message, true);
+    return;
+  }
+
+  let jsonStr;
+  try {
+    jsonStr = JSON.stringify(backup, null, 2);
+  } catch (e) {
+    showBackupStatus('Error al serializar los datos: ' + e.message, true);
+    return;
+  }
+
+  if (!jsonStr || jsonStr === '{}') {
+    showBackupStatus('Los datos no pudieron serializarse correctamente.', true);
+    return;
+  }
+
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = generateBackupFilename();
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  const planCount = backup.data.verdePlans.length;
+  const plantCount = backup.data.verdeCasaPlants.length;
+  showBackupStatus(`Copia exportada: ${planCount} planes, ${plantCount} plantas.`, false);
+}
+
+let pendingRestoreData = null;
+
+function handleImportFile(file) {
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    let parsed;
+    try {
+      parsed = JSON.parse(reader.result);
+    } catch (e) {
+      showBackupStatus('El archivo no es un JSON válido.', true);
+      return;
+    }
+
+    const validationError = validateBackupStructure(parsed);
+    if (validationError) {
+      showBackupStatus(validationError, true);
+      return;
+    }
+
+    pendingRestoreData = parsed;
+    const planCount = parsed.data.verdePlans.length;
+    const plantCount = parsed.data.verdeCasaPlants.length;
+    const confirmEl = $('#backupConfirm');
+    const textEl = $('#backupConfirmText');
+    if (confirmEl && textEl) {
+      textEl.textContent = `Se restaurarán ${planCount} planes y ${plantCount} plantas. Se hará un backup automático de los datos actuales antes de sobrescribir. ¿Deseas continuar?`;
+      confirmEl.hidden = false;
+    }
+    const statusEl = $('#backupStatus');
+    if (statusEl) statusEl.hidden = true;
+  };
+  reader.onerror = () => {
+    showBackupStatus('No se pudo leer el archivo seleccionado.', true);
+  };
+  reader.readAsText(file);
+}
+
+function performRestore() {
+  if (!pendingRestoreData) return;
+
+  const autoBackup = collectBackupData();
+  try {
+    localStorage.setItem('verdeAutoBackup', JSON.stringify(autoBackup));
+  } catch (e) {
+    showBackupStatus('No se pudo crear el backup automático. Restauración cancelada por seguridad.', true);
+    pendingRestoreData = null;
+    const confirmEl = $('#backupConfirm');
+    if (confirmEl) confirmEl.hidden = true;
+    return;
+  }
+
+  const d = pendingRestoreData.data;
+  try {
+    safeSetStorage('verdePlans', d.verdePlans);
+    safeSetStorage('verdeCasaPlants', d.verdeCasaPlants);
+    localStorage.setItem('verdeTheme', d.verdeTheme);
+    localStorage.setItem('plantnetApiKey', d.plantnetApiKey);
+    localStorage.setItem('geminiApiKey', d.geminiApiKey);
+  } catch (e) {
+    showBackupStatus('Error al restaurar los datos: ' + e.message + ' Se ha guardado un backup automático.', true);
+    const autoBackupStr = localStorage.getItem('verdeAutoBackup');
+    if (autoBackupStr) {
+      try {
+        const auto = JSON.parse(autoBackupStr);
+        safeSetStorage('verdePlans', auto.data.verdePlans);
+        safeSetStorage('verdeCasaPlants', auto.data.verdeCasaPlants);
+        localStorage.setItem('verdeTheme', auto.data.verdeTheme);
+        localStorage.setItem('plantnetApiKey', auto.data.plantnetApiKey);
+        localStorage.setItem('geminiApiKey', auto.data.geminiApiKey);
+      } catch (e2) {}
+    }
+    pendingRestoreData = null;
+    const confirmEl = $('#backupConfirm');
+    if (confirmEl) confirmEl.hidden = true;
+    return;
+  }
+
+  applyTheme(d.verdeTheme === 'dark');
+  const keyInput = $('#plantnetKey');
+  if (keyInput) keyInput.value = d.plantnetApiKey;
+  const geminiKeyInput = $('#geminiKey');
+  if (geminiKeyInput) geminiKeyInput.value = d.geminiApiKey;
+  renderTasks();
+  renderHistory();
+  renderCasa();
+
+  showBackupStatus('Datos restaurados correctamente. Se hizo un backup automático antes de restaurar.', false);
+  pendingRestoreData = null;
+  const confirmEl = $('#backupConfirm');
+  if (confirmEl) confirmEl.hidden = true;
+}
+
+const exportBackupBtn = $('#exportBackupBtn');
+if (exportBackupBtn) {
+  exportBackupBtn.addEventListener('click', exportBackup);
+}
+
+const importBackupInput = $('#importBackupInput');
+if (importBackupInput) {
+  importBackupInput.addEventListener('change', () => {
+    const file = importBackupInput.files[0];
+    if (file) handleImportFile(file);
+    importBackupInput.value = '';
+  });
+}
+
+const backupConfirmYes = $('#backupConfirmYes');
+if (backupConfirmYes) {
+  backupConfirmYes.addEventListener('click', performRestore);
+}
+
+const backupConfirmNo = $('#backupConfirmNo');
+if (backupConfirmNo) {
+  backupConfirmNo.addEventListener('click', () => {
+    pendingRestoreData = null;
+    const confirmEl = $('#backupConfirm');
+    if (confirmEl) confirmEl.hidden = true;
+  });
+}

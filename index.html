@@ -16,6 +16,9 @@
   <link rel="stylesheet" href="./mobile.css">
   <link rel="stylesheet" href="./improved-mobile.css">
   <link rel="stylesheet" href="./stitch-theme.css">
+  <meta property="og:image" content="https://bolt.new/static/og_default.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
 </head>
 <body>
   <div id="mainShell" class="app-view shell">
@@ -441,6 +444,28 @@
         <button id="clearHistoryBtn" class="clear-history-btn" type="button" hidden>Borrar todo</button>
       </div>
       <div id="historyList" class="history-list"></div>
+
+      <div class="backup-section">
+        <h3 class="backup-title">Copia de seguridad</h3>
+        <p class="backup-hint">Exporta todos tus datos (planes, plantas, tema y claves API) en un archivo para guardarlos o transferirlos a otro dispositivo.</p>
+        <div class="backup-actions">
+          <button id="exportBackupBtn" class="backup-btn" type="button">
+            <span class="material-symbols-outlined">download</span> Exportar datos
+          </button>
+          <label class="backup-btn" for="importBackupInput">
+            <span class="material-symbols-outlined">upload</span> Restaurar copia
+          </label>
+          <input id="importBackupInput" type="file" accept="application/json,.json" hidden>
+        </div>
+        <div id="backupStatus" class="backup-status" hidden></div>
+        <div id="backupConfirm" class="backup-confirm" hidden>
+          <p id="backupConfirmText"></p>
+          <div class="backup-confirm-actions">
+            <button id="backupConfirmYes" class="backup-btn backup-btn-danger" type="button">Sí, restaurar</button>
+            <button id="backupConfirmNo" class="backup-btn" type="button">Cancelar</button>
+          </div>
+        </div>
+      </div>
     </section>
   </div>
 
