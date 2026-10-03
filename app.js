@@ -728,7 +728,7 @@ $('#savePlanBtn').addEventListener('click', () => {
   const plantName = (!rawPlant || rawPlant === 'Selecciona una planta') ? 'Planta sin especificar' : rawPlant;
 
   const p = {
-    id: Date.now(),
+    id: crypto.randomUUID(),
     name: d.name,
     plant: plantName,
     date: new Date().toLocaleDateString('es-ES'),
@@ -1293,7 +1293,7 @@ casaSaveBtn.addEventListener('click', () => {
     }
   } else {
     plants.push({
-      id: Date.now(),
+      id: crypto.randomUUID(),
       name,
       space,
       diameter,
