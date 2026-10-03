@@ -19,23 +19,8 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-function safeGetStorage(key, fallback = null) {
-  try {
-    const val = localStorage.getItem(key);
-    return val !== null ? JSON.parse(val) : fallback;
-  } catch (e) {
-    console.warn(`Error al leer localStorage[${key}]:`, e);
-    return fallback;
-  }
-}
-
-function safeSetStorage(key, val) {
-  try {
-    localStorage.setItem(key, JSON.stringify(val));
-  } catch (e) {
-    console.warn(`Error al guardar localStorage[${key}]:`, e);
-  }
-}
+const { safeGetStorage, safeSetStorage } = VerdeData;
+const Data = VerdeData;
 
 const db = {
   manchas: {name:'Mancha foliar (posible hongo)', icon:'◌', confidence:'Patrón compatible · confirmar de cerca', copy:'Las manchas suelen aparecer cuando las hojas permanecen húmedas o el aire circula poco. Retira las hojas muy afectadas y observa si las lesiones avanzan.', check:'Comprueba el reverso de las hojas y evita tratar si hay lluvia, mucho calor o viento.', steps:[['Hoy','Sanea y aísla','Retira hojas afectadas con tijeras limpias. No las compostes. Riega solo el sustrato.'],['Día 3','Tratamiento preventivo','Si el problema avanza, consulta un producto fungicida autorizado para tu planta (por ejemplo, cobre o bicarbonato potásico) y sigue estrictamente la etiqueta.'],['Día 10','Revisión y repetición','Revisa los brotes nuevos. Repite solo si la etiqueta del producto y el estado de la planta lo indican.']], prevent:['Riega a primera hora y siempre a nivel del sustrato.','Deja espacio entre plantas para que circule el aire.','Revisa hojas nuevas una vez a la semana y retira las caídas.']},
@@ -475,17 +460,17 @@ const aiResultText = $('#aiResultText');
 const geminiStatus = $('#geminiStatus');
 
 if (keyInput) {
-  keyInput.value = localStorage.getItem('plantnetApiKey') || '';
+  keyInput.value = Data.getPlantNetApiKey();
   keyInput.addEventListener('input', () => {
-    localStorage.setItem('plantnetApiKey', keyInput.value.trim());
+    Data.setPlantNetApiKey(keyInput.value.trim());
     updateIdentifyButton();
   });
 }
 
 if (geminiKeyInput) {
-  geminiKeyInput.value = localStorage.getItem('geminiApiKey') || '';
+  geminiKeyInput.value = Data.getGeminiApiKey();
   geminiKeyInput.addEventListener('input', () => {
-    localStorage.setItem('geminiApiKey', geminiKeyInput.value.trim());
+    Data.setGeminiApiKey(geminiKeyInput.value.trim());
     updateIdentifyButton();
   });
 }
@@ -733,8 +718,8 @@ document.addEventListener('keydown', event => {
 $('#historyBtn').addEventListener('click', () => openModal('historyModal'));
 $('#openHistory').addEventListener('click', () => openModal('historyModal'));
 
-function getPlans(){ return safeGetStorage('verdePlans', []); }
-function setPlans(v){ safeSetStorage('verdePlans', v); }
+function getPlans(){ return Data.getPlans(); }
+function setPlans(v){ Data.setPlans(v); }
 
 $('#savePlanBtn').addEventListener('click', () => {
   const d = selectedData();
@@ -1097,12 +1082,12 @@ function applyTheme(dark) {
   document.body.classList.toggle('dark-theme', dark);
   themeIconLight.hidden = dark;
   themeIconDark.hidden = !dark;
-  localStorage.setItem('verdeTheme', dark ? 'dark' : 'light');
+  Data.setTheme(dark ? 'dark' : 'light');
   const metaTheme = document.querySelector('meta[name="theme-color"]');
   if (metaTheme) metaTheme.content = dark ? '#0a1f17' : '#032517';
 }
 
-const savedTheme = localStorage.getItem('verdeTheme');
+const savedTheme = Data.getTheme();
 applyTheme(savedTheme === 'dark');
 
 themeToggle.addEventListener('click', () => {
@@ -1172,11 +1157,11 @@ function formatWater(ml) {
 }
 
 function getCasaPlants() {
-  return safeGetStorage('verdeCasaPlants', []);
+  return Data.getCasaPlants();
 }
 
 function setCasaPlants(v) {
-  safeSetStorage('verdeCasaPlants', v);
+  Data.setCasaPlants(v);
 }
 
 const miCasaView = $('#miCasaView');
@@ -1405,11 +1390,11 @@ function collectBackupData() {
     exportedAt: new Date().toISOString(),
     version: BACKUP_VERSION,
     data: {
-      verdePlans: safeGetStorage('verdePlans', []),
-      verdeCasaPlants: safeGetStorage('verdeCasaPlants', []),
-      verdeTheme: localStorage.getItem('verdeTheme') || 'light',
-      plantnetApiKey: localStorage.getItem('plantnetApiKey') || '',
-      geminiApiKey: localStorage.getItem('geminiApiKey') || ''
+      verdePlans: Data.getPlans(),
+      verdeCasaPlants: Data.getCasaPlants(),
+      verdeTheme: Data.getTheme(),
+      plantnetApiKey: Data.getPlantNetApiKey(),
+      geminiApiKey: Data.getGeminiApiKey()
     }
   };
 }
@@ -1538,22 +1523,22 @@ function performRestore() {
 
   const d = pendingRestoreData.data;
   try {
-    safeSetStorage('verdePlans', d.verdePlans);
-    safeSetStorage('verdeCasaPlants', d.verdeCasaPlants);
-    localStorage.setItem('verdeTheme', d.verdeTheme);
-    localStorage.setItem('plantnetApiKey', d.plantnetApiKey);
-    localStorage.setItem('geminiApiKey', d.geminiApiKey);
+    Data.setPlans(d.verdePlans);
+    Data.setCasaPlants(d.verdeCasaPlants);
+    Data.setTheme(d.verdeTheme);
+    Data.setPlantNetApiKey(d.plantnetApiKey);
+    Data.setGeminiApiKey(d.geminiApiKey);
   } catch (e) {
     showBackupStatus('Error al restaurar los datos: ' + e.message + ' Se ha guardado un backup automático.', true);
     const autoBackupStr = localStorage.getItem('verdeAutoBackup');
     if (autoBackupStr) {
       try {
         const auto = JSON.parse(autoBackupStr);
-        safeSetStorage('verdePlans', auto.data.verdePlans);
-        safeSetStorage('verdeCasaPlants', auto.data.verdeCasaPlants);
-        localStorage.setItem('verdeTheme', auto.data.verdeTheme);
-        localStorage.setItem('plantnetApiKey', auto.data.plantnetApiKey);
-        localStorage.setItem('geminiApiKey', auto.data.geminiApiKey);
+        Data.setPlans(auto.data.verdePlans);
+        Data.setCasaPlants(auto.data.verdeCasaPlants);
+        Data.setTheme(auto.data.verdeTheme);
+        Data.setPlantNetApiKey(auto.data.plantnetApiKey);
+        Data.setGeminiApiKey(auto.data.geminiApiKey);
       } catch (e2) {}
     }
     pendingRestoreData = null;
